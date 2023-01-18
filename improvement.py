@@ -34,6 +34,9 @@ def train_and_predict(x_train, y_train, x_test, x_val, y_val):
                        L is the number of validation instances
                        K is the number of attributes
     y_val (numpy.ndarray): Class labels of validation set, numpy array of shape (L, )
+    
+    Returns:
+    numpy.ndarray: A numpy array of shape (M, ) containing the predicted class label for each instance in x_test
     """
 
     #######################################################################
