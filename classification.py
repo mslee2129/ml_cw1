@@ -7,7 +7,89 @@
 # You are free to add any other methods as needed. 
 ##############################################################################
 
+
+import matplotlib.pyplot as plt
 import numpy as np
+from numpy.random import default_rng
+
+
+
+#############################################################################
+# Loading and examining the dataset
+# creates a NumPy array of shape (N, K) representing N training instances of K attributes;
+# creastes a NumPy array of shape (N, ) containing the class label for each N instance. The class label
+# should be a string representing the character, e.g. "A", "E"
+##############################################################################
+
+def read_dataset(filepath):
+    """ Read in the dataset from the specified filepath
+
+    Args:
+        filepath (str): The filepath to the dataset file
+
+    Returns:
+        tuple: returns a tuple of (x, y, classes), each being a numpy array. 
+               - x is a numpy array with shape (N, K), 
+                   where N is the number of instances
+                   K is the number of features/attributes
+               - y is a numpy array with shape (N, ), and should be integers from 0 to C-1
+                   where C is the number of classes 
+               - classes : a numpy array with shape (C, ), which contains the 
+                   unique class labels corresponding to the integers in y
+    """
+
+    x = []
+    y_labels = []
+    for line in open(filepath):
+        if line.strip() != "": # handle empty rows in file
+            row = line.strip().split(",")
+            x.append(list(map(float, row[:-1]))) 
+            y_labels.append(row[-1])
+    
+    [classes, y] = np.unique(y_labels, return_inverse=True) 
+
+    x = np.array(x)
+    y = np.array(y)
+    return (x, y, classes) #return classes?
+
+def examine_dataset (x ,y, classes):
+    print(x.shape)
+    print(y.shape)
+    print(classes.shape)
+    print(classes)
+    print("min x = ", x.min(axis=0))
+    print("max x = ", x.max(axis=0))
+    print("min y = ", y.min(axis=0))
+    print("max y = ", y.max(axis=0))
+
+
+    n = classes.size
+    l = [0] *  n
+    for i in range(len(y)):
+        l[y[i]] += 1
+    
+    ratio = [0] * n
+    for i in range(n):
+        ratio[i] = float(l[i]/len(y)) * 100
+        print(l[i], " ", ratio[i])
+
+    plt.bar(range(n), ratio)
+    plt.show()
+
+
+
+
+
+(x, y, classes) = read_dataset("data/train_full.txt")
+examine_dataset(x,y,classes)
+
+(x, y, classes) = read_dataset("data/train_sub.txt")
+examine_dataset(x,y,classes)
+
+
+
+
+
 
 
 class DecisionTreeClassifier(object):
