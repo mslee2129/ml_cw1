@@ -19,7 +19,7 @@ def suggest_split_points(idx, data):
     suggestions = []
     for i in range(1,len(data_sorted[:,0])):
         if data_sorted[i,-1] != data_sorted[i-1,-1]:
-            candidate = int ((data_sorted[i,idx] + data_sorted[i-1,idx])/2)
+            candidate = int ((data_sorted[i,idx] + data_sorted[i-1,idx]) / 2)
             if len(suggestions) == 0 or suggestions[-1] != candidate:
                 suggestions.append(candidate)
     # print(suggestions)
@@ -35,23 +35,25 @@ def find_optimal_node(data):
             information_gain = find_information_gain(data, int(split_point), i)
             if information_gain > max_information_gain:
                 optimal_node = (i, split_point)
-    # print("The optimal node is: ", optimal_node)
+                max_information_gain = information_gain
+
+    print("The optimal node is: ", optimal_node, "with information gain:", max_information_gain)
     return optimal_node
 
 
 
 def find_entropy(class_labels):
-    no_of_class_instances = [0] * len(np.unique(class_labels))
-    class_instance = list(set(class_labels))
+    # a list the size of the number of different class instances
+    no_of_class_instances = [0] * len(np.unique(class_labels))  # used to count occurences of each class
+    class_instance = list(set(class_labels)) #lists the value of the class instances
 
     for i in range (len(class_labels)):
-        no_of_class_instances[class_instance.index(class_labels[i])] += 1
+        no_of_class_instances[class_instance.index(class_labels[i])] += 1 # add to counter list
     
     entropy = 0
     for i in range (len(no_of_class_instances)):
-        ratio = no_of_class_instances[i]/len(class_labels)
-
-        entropy -= ratio*log2(ratio)
+        ratio = no_of_class_instances[i] / len(class_labels)
+        entropy -= ratio * log2(ratio)
     
     return entropy
 
@@ -73,11 +75,12 @@ def find_information_gain(dataset, split_index, attribute_index): # attribute-va
     entropy_left = find_entropy(labels_left)
     entropy_right = find_entropy(labels_right)  
 
-    entropy_weighted_average = entropy_left * (len(labels_left)/rows) + entropy_right * (len(labels_right)/rows)
+    entropy_weighted_average = entropy_left * (len(labels_left) / rows) + entropy_right * (len(labels_right) / rows)
     
     information_gain = entropy_pre_split - entropy_weighted_average
     
     return information_gain
+
 
 def make_split(dataset, attribute_index, split_index): 
     data_sorted = dataset[dataset[:,attribute_index].argsort()]
