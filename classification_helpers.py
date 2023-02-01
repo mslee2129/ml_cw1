@@ -19,7 +19,7 @@ def suggest_split_points(idx, data):
     suggestions = []
     for i in range(1,len(data_sorted[:,0])):
         if data_sorted[i,-1] != data_sorted[i-1,-1]:
-            candidate = np.floor((data_sorted[i,idx] + data_sorted[i-1,idx])/2)
+            candidate = int ((data_sorted[i,idx] + data_sorted[i-1,idx])/2)
             if len(suggestions) == 0 or suggestions[-1] != candidate:
                 suggestions.append(candidate)
     # print(suggestions)
@@ -28,12 +28,13 @@ def suggest_split_points(idx, data):
 
 
 def find_optimal_node(data):
-    optimal_node = (0, 0, 0) # optimal_node = (index, split value, information gain)
+    optimal_node = (0, 0) # optimal_node = (index, split value)
+    max_information_gain = 0
     for i in range(len(data[0])-1): # loop through attributes
         for split_point in suggest_split_points(i, data): # loop through suggested split points
             information_gain = find_information_gain(data, int(split_point), i)
-            if information_gain > optimal_node[2]:
-                optimal_node = (i, split_point, information_gain)
+            if information_gain > max_information_gain:
+                optimal_node = (i, split_point)
     # print("The optimal node is: ", optimal_node)
     return optimal_node
 
@@ -77,3 +78,10 @@ def find_information_gain(dataset, split_index, attribute_index): # attribute-va
     information_gain = entropy_pre_split - entropy_weighted_average
     
     return information_gain
+
+def make_split(dataset, attribute_index, split_index): 
+    data_sorted = dataset[dataset[:,attribute_index].argsort()]
+    data_left = data_sorted[:split_index]
+    data_right = data_sorted[split_index:]
+    
+    return [data_left, data_right]

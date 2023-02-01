@@ -13,7 +13,7 @@ from improvement import train_and_predict
 
 if __name__ == "__main__":
 
-    # ADDED BY US
+    # ############# QUESTION 1 #######################
     # Reading and examining the datasets
     #(x, y, classes) = cl.read_dataset("data/train_full.txt")
     #cl.examine_dataset(x,y,classes, "train_full")
@@ -30,7 +30,9 @@ if __name__ == "__main__":
     ############### QUESTION 2 ###############
     tup = cl.read_dataset("./data/toy.txt")
     data = ch.concat_data_helper(tup)
+    att_index, split_index = ch.find_optimal_node(data)
     print(ch.find_optimal_node(data))
+    print(ch.make_split(data, att_index, split_index))
 
 
     """    
