@@ -28,8 +28,8 @@ if __name__ == "__main__":
 
 
     ############### QUESTION 2 ###############
-    tup = cl.read_dataset("./data/toy.txt")
-    data = ch.concat_data_helper(tup)
+    x,y,c  = cl.read_dataset("./data/toy.txt")
+    data = ch.concat_data_helper(x,y)
     att_index, split_index = ch.find_optimal_node(data)
     print(ch.find_optimal_node(data))
     print(ch.make_split(data, att_index, split_index))
