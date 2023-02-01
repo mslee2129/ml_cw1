@@ -1,7 +1,7 @@
 import numpy as np
 from classification import read_dataset
 from math import log2
-
+import matplotlib.pyplot as plt
 
 ######################################
 # Read and examine
@@ -200,7 +200,7 @@ def make_split(dataset, attribute_index, split_index):
 def create_decision_tree(dataset):
     rows, cols = np.shape(dataset)
 
-    labels = data[:,cols - 1] #labels column is the last one
+    labels = dataset[:,cols - 1] #labels column is the last one
 
     if len(np.unique(labels)) == 1 or rows == 1: # if only one type of label left or only one row left (data can't be split further)
         return labels[0]
