@@ -7,7 +7,7 @@
 import numpy as np
 
 import classification as cl # ADDED BY US
-
+import classification_helpers as ch
 # from classification import DecisionTreeClassifier # COMMENTED BY US
 from improvement import train_and_predict
 
@@ -15,16 +15,22 @@ if __name__ == "__main__":
 
     # ADDED BY US
     # Reading and examining the datasets
-    (x, y, classes) = cl.read_dataset("data/train_full.txt")
-    cl.examine_dataset(x,y,classes, "train_full")
+    #(x, y, classes) = cl.read_dataset("data/train_full.txt")
+    #cl.examine_dataset(x,y,classes, "train_full")
 
     #(x, y, classes) = cl.read_dataset("data/train_sub.txt")
     # cl.examine_dataset(x,y,classes, "train_sub")
 
-    (x, y, classes) = cl.read_dataset("data/train_noisy.txt")
-    cl.examine_dataset(x,y,classes, "train_noisy")
+    #(x, y, classes) = cl.read_dataset("data/train_noisy.txt")
+    #cl.examine_dataset(x,y,classes, "train_noisy")
 
 
+
+
+    ############### QUESTION 2 ###############
+    tup = cl.read_dataset("./data/toy.txt")
+    data = ch.concat_data_helper(tup)
+    print(ch.find_optimal_node(data))
 
 
     """    
