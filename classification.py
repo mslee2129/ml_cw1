@@ -7,18 +7,12 @@
 # You are free to add any other methods as needed. 
 ##############################################################################
 
-
 import matplotlib.pyplot as plt
 import numpy as np
 from numpy.random import default_rng
 
-
-
 #############################################################################
 # Loading and examining the dataset
-# creates a NumPy array of shape (N, K) representing N training instances of K attributes;
-# creastes a NumPy array of shape (N, ) containing the class label for each N instance. The class label
-# should be a string representing the character, e.g. "A", "E"
 ##############################################################################
 
 def read_dataset(filepath):
@@ -52,44 +46,72 @@ def read_dataset(filepath):
     y = np.array(y)
     return (x, y, classes) #return classes?
 
-def examine_dataset (x ,y, classes):
-    print(x.shape)
-    print(y.shape)
-    print(classes.shape)
-    print(classes)
-    print("min x = ", x.min(axis=0))
-    print("max x = ", x.max(axis=0))
-    print("min y = ", y.min(axis=0))
-    print("max y = ", y.max(axis=0))
+def examine_dataset (x ,y, classes, dataset_name = ""):
+    print("############", dataset_name, "############")
 
+    print("---- Shapes ---- ")
+    print("The shape of x is: ", x.shape)
+    print("The shape of y is: ", y.shape)
+    #print("The shape of classes is: ", classes.shape)
+    print()
 
-    n = classes.size
-    l = [0] *  n
+    print(classes, "\n")
+
+    print("---- Min, Max, Mean ----")
+    print("Minimum of x :", x.min(axis=0))
+    print("Maximum of x :", x.max(axis=0))
+    print("Mean of x :", x.mean(axis=0), "\n")
+
+    print("Minimum of y:", y.min(axis=0)) ## THIS IS NOT GIVING US WHAT WE NEED
+    print("Maximum of y:", y.max(axis=0)) ## THIS IS NOT GIVING US WHAT WE NEED
+    print("Mean of y :", y.mean(axis=0), "\n") ## THIS IS NOT GIVING US WHAT WE NEED
+
+    """ ------------  Number of instances  ---------------- """
+    # Finding the number of instances of each class
+    num_classes = classes.size
+    l = [0] *  num_classes
     for i in range(len(y)):
         l[y[i]] += 1
+
+    # Printing number of obs in each class
+    print("Num observations in each class: \n")
+    for i in range(num_classes):
+        print("Class", i, ":", round(l[i]))
     
-    ratio = [0] * n
-    for i in range(n):
+    # Showing a graphical representation of the repartition (#) of observations by classes
+    plt.bar(range(num_classes), l, )
+    title_str = "Number of observation per classes. Dataset: " + dataset_name
+    plt.title(title_str)
+    plt.xlabel('Class number')
+    plt.ylabel('Number of observations')
+    # plt.show()
+    file_name = "graphs/numObs_" + dataset_name
+    plt.savefig(file_name)
+    plt.clf() # Clears the figure so the graphs don't overlap in the saved file
+
+    """ ------------  RATIO  ---------------- """
+    # Getting the ratio of each class
+    ratio = [0] * num_classes
+    print("Ratio of each class: \n")
+    for i in range(num_classes):
         ratio[i] = float(l[i]/len(y)) * 100
-        print(l[i], " ", ratio[i])
+        print("Class", i, ":", round(ratio[i]), "%")
 
-    plt.bar(range(n), ratio)
-    plt.show()
-
-
-
-
-
-(x, y, classes) = read_dataset("data/train_full.txt")
-examine_dataset(x,y,classes)
-
-(x, y, classes) = read_dataset("data/train_sub.txt")
-examine_dataset(x,y,classes)
+    # Showing a graphical representation of the repartition (%) of observations by classes
+    plt.bar(range(num_classes), ratio, )
+    title_str = "Ratio of dataset: " + dataset_name
+    plt.title(title_str)
+    plt.xlabel('Class number')
+    plt.ylabel('Percentage of values (weight of the class)')
+    # plt.show()
+    file_name = "graphs/ratio_" + dataset_name
+    plt.savefig(file_name)
+    plt.clf() # Clears the figure so the graphs don't overlap in the saved file
 
 
-
-
-
+#############################################################################
+# Decision Tree
+##############################################################################
 
 
 class DecisionTreeClassifier(object):

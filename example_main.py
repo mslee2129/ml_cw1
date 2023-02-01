@@ -6,10 +6,28 @@
 
 import numpy as np
 
-from classification import DecisionTreeClassifier
+import classification as cl # ADDED BY US
+
+# from classification import DecisionTreeClassifier # COMMENTED BY US
 from improvement import train_and_predict
 
 if __name__ == "__main__":
+
+    # ADDED BY US
+    # Reading and examining the datasets
+    (x, y, classes) = cl.read_dataset("data/train_full.txt")
+    cl.examine_dataset(x,y,classes, "train_full")
+
+    #(x, y, classes) = cl.read_dataset("data/train_sub.txt")
+    # cl.examine_dataset(x,y,classes, "train_sub")
+
+    (x, y, classes) = cl.read_dataset("data/train_noisy.txt")
+    cl.examine_dataset(x,y,classes, "train_noisy")
+
+
+
+
+    """    
     print("Loading the training dataset...");
     x = np.array([
             [5,7,1],
@@ -51,3 +69,4 @@ if __name__ == "__main__":
     predictions = train_and_predict(x, y, x_test, x_val, y_val)
     print("Predictions: {}".format(predictions))
     
+    """
