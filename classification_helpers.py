@@ -120,11 +120,12 @@ def suggest_split_points(idx, data):
     # print("Sorted data: ", data_sorted)
     suggestions = []
     for i in range(1,len(data_sorted[:,0])):
-        if data_sorted[i,-1] != data_sorted[i-1,-1] and data_sorted[i,idx] != data_sorted[i-1, idx]:
+        if data_sorted[i,-1] != data_sorted[i-1,-1] :
             candidate = int ((data_sorted[i,idx] + data_sorted[i-1,idx]) / 2)
             if len(suggestions) == 0 or suggestions[-1] != candidate:
                 suggestions.append(candidate)
-    # print(suggestions)
+    
+    #print("Suggestions for attribute %a:" % idx, suggestions)
     return suggestions
 
 
@@ -132,14 +133,22 @@ def suggest_split_points(idx, data):
 def find_optimal_node(data):
     optimal_node = (0, 0) # optimal_node = (index, split value)
     max_information_gain = 0
-    for i in range(len(data[0])-1): # loop through attributes
+
+    for i in range(len(data[0]) - 1): # loop through attributes # -1 since you want to exclude the label column
+
         for split_point in suggest_split_points(i, data): # loop through suggested split points
-            information_gain = find_information_gain(data, int(split_point), i)
+            information_gain = find_information_gain(data, split_point, i)
+
+            #print("Hey Hey, I am trying to find the information gain of split point", split_point, "on attribute", i, "and i found", information_gain)
+            
             if information_gain > max_information_gain:
                 optimal_node = (i, split_point)
+             
                 max_information_gain = information_gain
+            
 
-    # print("The optimal node is: ", optimal_node, "with information gain:", max_information_gain)
+    #print("The optimal node is: ", optimal_node, "with information gain:", max_information_gain)
+
     return optimal_node
 
 
@@ -157,6 +166,7 @@ def find_entropy(class_labels):
         ratio = no_of_class_instances[i] / len(class_labels)
         entropy -= ratio * log2(ratio)
     
+    #print("$$$", entropy)
     return entropy
 
 
@@ -164,15 +174,28 @@ def find_entropy(class_labels):
 def find_information_gain(dataset, split_index, attribute_index): # attribute-values = x; labels = y
 
     # data_concat = np.concatenate((attribute_values, np.expand_dims(labels, axis=0).T), axis=1)
-    data_sorted = dataset[dataset[:,attribute_index].argsort()] # add attribute_index
+    # data_sorted = dataset[dataset[:,attribute_index].argsort()] # add attribute_index
     
     rows, cols = np.shape(dataset)
-    sorted_labels = data_sorted[:,cols - 1] # -1 because shape returns the length
+    labels = dataset[:,cols - 1] # -1 because shape returns the length
   
-    entropy_pre_split = find_entropy(sorted_labels)
+    entropy_pre_split = find_entropy(labels)
+    #print("!:) :( ", entropy_pre_split)
 
-    labels_left = sorted_labels[:split_index]
-    labels_right = sorted_labels[split_index:]
+    left = dataset[dataset[:,attribute_index] <= split_index]
+    labels_left = left[:,-1]
+    right = dataset[dataset[:,attribute_index] > split_index]
+    labels_right = right[:,-1]
+
+    #print("Split index: ", split_index, "on attribute", attribute_index)
+    #print("DATABSE: ", dataset)
+    #print("LEFT!!!!!!!!!!!!!!!!!!!!!" , left)    
+    #print("LEFT LABELS!!!!!" , labels_left)   
+    #print("RIGHT!!!!!!!!!!!!!!!!!!!!!" , right)    
+    #print("RIGGHT LABELS!!!!!!" , labels_right)    
+
+    #labels_left = labels[:split_index]
+    #labels_right = labels[split_index:]
 
     entropy_left = find_entropy(labels_left)
     entropy_right = find_entropy(labels_right)  
@@ -180,14 +203,14 @@ def find_information_gain(dataset, split_index, attribute_index): # attribute-va
     entropy_weighted_average = entropy_left * (len(labels_left) / rows) + entropy_right * (len(labels_right) / rows)
     
     information_gain = entropy_pre_split - entropy_weighted_average
-    
+    print(information_gain)
     return information_gain
 
 
 def make_split(dataset, attribute_index, split_index): 
-    data_sorted = dataset[dataset[:,attribute_index].argsort()]
-    data_left = data_sorted[:split_index]
-    data_right = data_sorted[split_index:]
+    # data_sorted = dataset[dataset[:,attribute_index].argsort()]
+    data_left = dataset[dataset[:,attribute_index] <= split_index]
+    data_right = dataset[dataset[:,attribute_index] > split_index]
     
     return [data_left, data_right]
 
@@ -206,36 +229,43 @@ class Node:
         self.children[i] = node
 
     def __str__(self):
-        return "Attribute: % a at index: %i" % (self.attribute_index, self.split_index)
+        return "Split is happening at attribute: % a and index: %i" % (self.attribute_index, self.split_index)
     
     def recursive_print(self):
         print(self)
         
         for i in range(2):
             if isinstance(self.children[i], Node):
-                print("Children: %i" % (i))
+                print(self, "Children: %i" % (i))
                 self.children[i].recursive_print()
             else:
-                print("Children: %i" % (i))
-                print("Label: ", self.children[i])
+                print("Children: %i has label" % (i), self.children[i])
      
 
 def create_decision_tree(dataset):
     rows, cols = np.shape(dataset)
 
     labels = dataset[:,cols - 1] #labels column is the last one
-    print("Dataset :", dataset)
-    print("Labels :", labels)
+    #print("Dataset :", dataset)
+    #print("Labels :", labels)
+    #print(len(np.unique((dataset[:,:-1]), axis=0)))
 
     if len(np.unique(labels)) == 1 or len(np.unique((dataset[:,:-1]), axis=0)) == 1: # if only one type of label left or they all have the same attributes
         return labels[0]
-    
+
+    #print("I wasn't caught")
+
     attribute_index, split_index = find_optimal_node(dataset) # maybe want to merge with line below, but would need to modify the input and return parameters of find_optimal_node and make_split
+   
+    #print("Split on attribute", attribute_index, "at index", split_index)
+   
     node = Node(attribute_index, split_index)
     children_datasets = make_split(dataset, attribute_index, split_index)
-
+   
     for i in range(len(children_datasets)): # 0 or 1
+        print(children_datasets[i])
         child_node = create_decision_tree(children_datasets[i])
+  
         node.add_child(child_node,i) 
     
     return node
