@@ -120,7 +120,7 @@ def suggest_split_points(idx, data):
     # print("Sorted data: ", data_sorted)
     suggestions = []
     for i in range(1,len(data_sorted[:,0])):
-        if data_sorted[i,-1] != data_sorted[i-1,-1]:
+        if data_sorted[i,-1] != data_sorted[i-1,-1] and data_sorted[i,idx] != data_sorted[i-1, idx]:
             candidate = int ((data_sorted[i,idx] + data_sorted[i-1,idx]) / 2)
             if len(suggestions) == 0 or suggestions[-1] != candidate:
                 suggestions.append(candidate)
