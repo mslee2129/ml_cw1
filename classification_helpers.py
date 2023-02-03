@@ -216,6 +216,7 @@ class Node:
                 print("Children: %i" % (i))
                 self.children[i].recursive_print()
             else:
+                print("Children: %i" % (i))
                 print("Label: ", self.children[i])
      
 
@@ -223,8 +224,8 @@ def create_decision_tree(dataset):
     rows, cols = np.shape(dataset)
 
     labels = dataset[:,cols - 1] #labels column is the last one
-    print(dataset)
-    print(labels)
+    print("Dataset :", dataset)
+    print("Labels :", labels)
 
     if len(np.unique(labels)) == 1 or len(np.unique((dataset[:,:-1]), axis=0)) == 1: # if only one type of label left or they all have the same attributes
         return labels[0]
