@@ -1,5 +1,4 @@
 import numpy as np
-from classification import read_dataset
 from math import log2
 import matplotlib.pyplot as plt
 
@@ -140,7 +139,7 @@ def find_optimal_node(data):
                 optimal_node = (i, split_point)
                 max_information_gain = information_gain
 
-    print("The optimal node is: ", optimal_node, "with information gain:", max_information_gain)
+    # print("The optimal node is: ", optimal_node, "with information gain:", max_information_gain)
     return optimal_node
 
 
@@ -197,19 +196,45 @@ def make_split(dataset, attribute_index, split_index):
 # RECURSION
 ######################################
 
+class Node:
+    def __init__(self, attribute_index, split_index):
+        self.attribute_index = attribute_index
+        self.split_index = split_index
+        self.children = [None, None]
+    
+    def add_child(self, node, i):
+        self.children[i] = node
+
+    def __str__(self):
+        return "Attribute: % a at index: %i" % (self.attribute_index, self.split_index)
+    
+    def recursive_print(self):
+        print(self)
+        
+        for i in range(2):
+            if isinstance(self.children[i], Node):
+                print("Children: %i" % (i))
+                self.children[i].recursive_print()
+            else:
+                print("Label: ", self.children[i])
+     
+
 def create_decision_tree(dataset):
     rows, cols = np.shape(dataset)
 
     labels = dataset[:,cols - 1] #labels column is the last one
+    print(dataset)
+    print(labels)
 
-    if len(np.unique(labels)) == 1 or rows == 1: # if only one type of label left or only one row left (data can't be split further)
+    if len(np.unique(labels)) == 1 or len(np.unique((dataset[:,:-1]), axis=0)) == 1: # if only one type of label left or they all have the same attributes
         return labels[0]
     
-    attribute_index, split_index = find_optimal_node(dataset)
+    attribute_index, split_index = find_optimal_node(dataset) # maybe want to merge with line below, but would need to modify the input and return parameters of find_optimal_node and make_split
+    node = Node(attribute_index, split_index)
     children_datasets = make_split(dataset, attribute_index, split_index)
 
-    for child_dataset in children_datasets:
-        create_decision_tree(children_datasets) # unclear what to do
-        # how do we do: node.add child(child node)
+    for i in range(len(children_datasets)): # 0 or 1
+        child_node = create_decision_tree(children_datasets[i])
+        node.add_child(child_node,i) 
     
-    return (attribute_index, split_index) # unclear what to return
+    return node
