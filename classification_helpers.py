@@ -120,10 +120,11 @@ def suggest_split_points(idx, data):
     # print("Sorted data: ", data_sorted)
     suggestions = []
     for i in range(1,len(data_sorted[:,0])):
-        if data_sorted[i,-1] != data_sorted[i-1,-1] and data_sorted[i,idx] != data_sorted[i-1, idx]:
+        #if data_sorted[i,-1] != data_sorted[i-1,-1] and data_sorted[i,idx] != data_sorted[i-1, idx]:
+        if data_sorted[i,-1] != data_sorted[i-1,-1]:
             candidate = int ((data_sorted[i,idx] + data_sorted[i-1,idx]) / 2)
             if len(suggestions) == 0 or suggestions[-1] != candidate:
-                suggestions.append(candidate)
+                suggestions.append(i) # we return the index and since the above 
     # print(suggestions)
     return suggestions
 
@@ -132,14 +133,16 @@ def suggest_split_points(idx, data):
 def find_optimal_node(data):
     optimal_node = (0, 0) # optimal_node = (index, split value)
     max_information_gain = 0
+    #print("Dataset we are splitting: ", data)
     for i in range(len(data[0])-1): # loop through attributes
+        #print('Split suggestions for attribute ', i,' are ', suggest_split_points(i, data))
         for split_point in suggest_split_points(i, data): # loop through suggested split points
             information_gain = find_information_gain(data, int(split_point), i)
             if information_gain > max_information_gain:
                 optimal_node = (i, split_point)
                 max_information_gain = information_gain
 
-    # print("The optimal node is: ", optimal_node, "with information gain:", max_information_gain)
+    #print('\nWe have decided to split on attribute ', optimal_node[0], ' at index ', optimal_node[1], '\n\n\n')
     return optimal_node
 
 
@@ -213,6 +216,7 @@ class Node:
         
         for i in range(2):
             if isinstance(self.children[i], Node):
+                print(self)
                 print("Children: %i" % (i))
                 self.children[i].recursive_print()
             else:
@@ -223,9 +227,7 @@ class Node:
 def create_decision_tree(dataset):
     rows, cols = np.shape(dataset)
 
-    labels = dataset[:,cols - 1] #labels column is the last one
-    print("Dataset :", dataset)
-    print("Labels :", labels)
+    labels = dataset[:,-1] #labels column is the last one
 
     if len(np.unique(labels)) == 1 or len(np.unique((dataset[:,:-1]), axis=0)) == 1: # if only one type of label left or they all have the same attributes
         return labels[0]

@@ -28,14 +28,14 @@ if __name__ == "__main__":
 
 
     ############### QUESTION 2 ###############
-    x,y,c  = ch.read_dataset("./data/toy.txt")
+    x,y,c  = ch.read_dataset("./data/simple2.txt")
     data = ch.concat_data_helper(x,y)
     #att_index, split_index = ch.find_optimal_node(data)
     #print(ch.find_optimal_node(data))
     #print(ch.make_split(data, att_index, split_index))
 
     tree = ch.create_decision_tree(data)
-    tree.recursive_print()
+    #tree.recursive_print()
 
     """    
     print("Loading the training dataset...");
