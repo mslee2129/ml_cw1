@@ -28,7 +28,7 @@ if __name__ == "__main__":
 
 
     ############### QUESTION 2 ###############
-    x,y,c  = ch.read_dataset("./data/simple1.txt")
+    x,y,c  = ch.read_dataset("./data/train_full.txt")
     data = ch.concat_data_helper(x,y)
     #att_index, split_index = ch.find_optimal_node(data)
     #print(ch.find_optimal_node(data))
