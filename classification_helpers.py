@@ -109,7 +109,6 @@ def get_int_labels(str_labels):
     classes, int_labels = np.unique(str_labels, return_inverse = True)
     return int_labels
 
-
 def concat_data_helper(data, labels):
     # Adds the labels as the last column of the dataset
     data_concat = np.concatenate((data, np.expand_dims(labels, axis=0).T), axis=1) 
@@ -278,6 +277,9 @@ def create_decision_tree(dataset):
     return node
 
 
+######################################
+# PREDICTION
+######################################
 def predict_value(decision_tree, data): # NEED TO IMPROVE THE 4 CASES -- *DRY*
     if(decision_tree.split_flag): #If the split is happening *above*
         

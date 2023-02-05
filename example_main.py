@@ -10,6 +10,7 @@ import numpy as np
 import classification_helpers as ch
 from classification import DecisionTreeClassifier # COMMENTED BY US
 from improvement import train_and_predict
+from evalutation_functions import print_all_evaluation_metrics
 
 if __name__ == "__main__":
 
@@ -68,6 +69,8 @@ if __name__ == "__main__":
     predictions = classifier.predict(x_test)
     print("Predictions: {}".format(predictions))
     
+    print_all_evaluation_metrics(y_test, predictions)
+
     """
     x_val = np.array([
                 [6,7,2],
