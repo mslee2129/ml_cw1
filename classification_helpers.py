@@ -105,6 +105,11 @@ def examine_dataset (x ,y, classes, dataset_name = ""):
 # Helpers for recursion
 ######################################
 
+def get_int_labels(str_labels):
+    classes, int_labels = np.unique(str_labels, return_inverse = True)
+    return int_labels
+
+
 def concat_data_helper(data, labels):
     # Adds the labels as the last column of the dataset
     data_concat = np.concatenate((data, np.expand_dims(labels, axis=0).T), axis=1) 
@@ -271,3 +276,41 @@ def create_decision_tree(dataset):
         node.add_child(child_node,i) # adding the child nodes to the node created earlier.
     
     return node
+
+
+def predict_value(decision_tree, data): # NEED TO IMPROVE THE 4 CASES -- *DRY*
+    if(decision_tree.split_flag): #If the split is happening *above*
+        
+        # CASE 1 of 4
+        if(data[decision_tree.attribute_index] < decision_tree.split_index): # take left
+            if(isinstance(decision_tree.children[0], Node)): #if there is another branch
+                return predict_value(decision_tree.children[0], data)
+            
+            else: # if it is a leaf, return the predicted value
+                return decision_tree.children[0]
+
+        # CASE 2 of 4
+        if(data[decision_tree.attribute_index] >= decision_tree.split_index): # take right
+            if(isinstance(decision_tree.children[1], Node)): #if there is another branch
+                return predict_value(decision_tree.children[1], data)
+            
+            else: # if it is a leaf, return the predicted value
+                return decision_tree.children[1]
+    
+    # Below is actually the default case, if we're not cutting on a value contained in the set
+    else: # if the split is happening *below*, meaning if the value is smaller we take the right branch
+        # CASE 3 of 4
+        if(data[decision_tree.attribute_index] <= decision_tree.split_index):
+            if(isinstance(decision_tree.children[0], Node)): #if there is another branch
+                return predict_value(decision_tree.children[0], data)
+            
+            else: # if it is a leaf, return the predicted value
+                return decision_tree.children[0]
+        
+         # CASE 4 of 4
+        if(data[decision_tree.attribute_index] > decision_tree.split_index): # take right
+            if(isinstance(decision_tree.children[1], Node)): #if there is another branch
+                return predict_value(decision_tree.children[1], data)
+            
+            else: # if it is a leaf, return the predicted value
+                return decision_tree.children[1]
