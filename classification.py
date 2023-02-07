@@ -30,6 +30,7 @@ class DecisionTreeClassifier(object):
 
     def __init__(self):
         self.is_trained = False
+        self.decision_tree = None
     
 
     def fit(self, x, y):
@@ -50,12 +51,14 @@ class DecisionTreeClassifier(object):
         #######################################################################
         #                 ** TASK 2.1: COMPLETE THIS METHOD **
         #######################################################################    
-        data = ch.concat_data_helper(x,y)
+        int_labels = ch.get_int_labels(y)
+        data = ch.concat_data_helper(x,int_labels)
 
-        ch.create_decision_tree(data)
+        self.decision_tree = ch.create_decision_tree(data)
         
         # set a flag so that we know that the classifier has been trained
         self.is_trained = True
+        (self.decision_tree).recursive_print()
         
     
     def predict(self, x):
@@ -79,14 +82,15 @@ class DecisionTreeClassifier(object):
         
         # set up an empty (M, ) numpy array to store the predicted labels 
         # feel free to change this if needed
-        predictions = np.zeros((x.shape[0],), dtype=np.object)
-        
+        predictions = np.zeros((x.shape[0],), dtype=np.object_)
         
         #######################################################################
         #                 ** TASK 2.2: COMPLETE THIS METHOD **
         #######################################################################
+        #x.shape[0] returns the number of rows
+        for index in range(x.shape[0]): #Going through every value we want to predict
+            predictions[index] = ch.predict_value(self.decision_tree, x[index])
         
-    
         # remember to change this if you rename the variable
         return predictions
         

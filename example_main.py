@@ -6,17 +6,18 @@
 
 import numpy as np
 
-import classification as cl # ADDED BY US
+# import classification as cl # ADDED BY US
 import classification_helpers as ch
-# from classification import DecisionTreeClassifier # COMMENTED BY US
+from classification import DecisionTreeClassifier # COMMENTED BY US
 from improvement import train_and_predict
+from evalutation_functions import print_all_evaluation_metrics
 
 if __name__ == "__main__":
 
     # ############# QUESTION 1 #######################
     # Reading and examining the datasets
-    #(x, y, classes) = cl.read_dataset("data/train_full.txt")
-    #cl.examine_dataset(x,y,classes, "train_full")
+    #(x, y, classes) = ch.read_dataset("data/simple1.txt")
+    #ch.examine_dataset(x,y,classes, "simple1")
 
     #(x, y, classes) = cl.read_dataset("data/train_sub.txt")
     # cl.examine_dataset(x,y,classes, "train_sub")
@@ -28,16 +29,15 @@ if __name__ == "__main__":
 
 
     ############### QUESTION 2 ###############
-    x,y,c  = ch.read_dataset("./data/toy.txt")
-    data = ch.concat_data_helper(x,y)
+    #x,y,c  = ch.read_dataset("./data/train_full.txt")
+    #data = ch.concat_data_helper(x,y)
     #att_index, split_index = ch.find_optimal_node(data)
     #print(ch.find_optimal_node(data))
     #print(ch.make_split(data, att_index, split_index))
-
-    tree = ch.create_decision_tree(data)
-    tree.recursive_print()
-
-    """    
+    
+    #tree = ch.create_decision_tree(data)
+    #tree.recursive_print()
+    
     print("Loading the training dataset...");
     x = np.array([
             [5,7,1],
@@ -49,7 +49,7 @@ if __name__ == "__main__":
         ])
     
     y = np.array(["A", "A", "A", "C", "C", "C"])
-    
+
     print("Training the decision tree...")
     classifier = DecisionTreeClassifier()
     classifier.fit(x, y)
@@ -69,6 +69,9 @@ if __name__ == "__main__":
     predictions = classifier.predict(x_test)
     print("Predictions: {}".format(predictions))
     
+    print_all_evaluation_metrics(y_test, predictions)
+
+    """
     x_val = np.array([
                 [6,7,2],
                 [3,1,3]
@@ -78,5 +81,4 @@ if __name__ == "__main__":
     print("Training the improved decision tree, and making predictions on the test set...")
     predictions = train_and_predict(x, y, x_test, x_val, y_val)
     print("Predictions: {}".format(predictions))
-    
     """
