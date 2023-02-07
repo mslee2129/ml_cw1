@@ -19,13 +19,18 @@ if __name__ == "__main__":
     #(x, y, classes) = ch.read_dataset("data/simple1.txt")
     #ch.examine_dataset(x,y,classes, "simple1")
 
-    #(x, y, classes) = cl.read_dataset("data/train_sub.txt")
-    # cl.examine_dataset(x,y,classes, "train_sub")
+    #(x, y, classes) = ch.read_dataset("data/train_sub.txt")
+    # ch.examine_dataset(x,y,classes, "train_sub")
 
-    #(x, y, classes) = cl.read_dataset("data/train_noisy.txt")
-    #cl.examine_dataset(x,y,classes, "train_noisy")
+    #(x, y, classes) = ch.read_dataset("data/train_noisy.txt")
+    #ch.examine_dataset(x,y,classes, "train_noisy")
 
-
+    # Q1.3
+    # (x_noisy, y_noisy, classes_noisy) = ch.read_dataset("data/train_noisy.txt")
+    # noisy_data = ch.concat_data_helper(x_noisy, y_noisy)
+    # (x, y, classes) = ch.read_dataset("data/train_full.txt")
+    # clean_data = ch.concat_data_helper(x,y)
+    # ch.noisy_data_comparison(clean_data, noisy_data)
 
 
     ############### QUESTION 2 ###############

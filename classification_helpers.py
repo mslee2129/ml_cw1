@@ -99,7 +99,33 @@ def examine_dataset (x ,y, classes, dataset_name = ""):
     plt.savefig(file_name)
     plt.clf() # Clears the figure so the graphs don't overlap in the saved file
 
+def noisy_data_comparison(clean_data, noisy_data):
+    # sort both arrays by attributes, not the label
+    # we then iterate through the classes to see which observations differ
 
+    # iteratively sort each attribute, see: https://opensourceoptions.com/blog/sort-numpy-arrays-by-columns-or-rows/#:~:text=NumPy%20arrays%20can%20be%20sorted,an%20array%20in%20ascending%20value.
+    # print('Num attributes: ', len(clean_data[0])-1)
+    num_attributes = len(clean_data[0])-1
+    for i in reversed(range(num_attributes)):
+        if i == num_attributes-1:
+            clean_data = clean_data[clean_data[:,i].argsort()]
+            noisy_data = noisy_data[noisy_data[:,i].argsort()]
+        else:
+            clean_data = clean_data[clean_data[:,i].argsort(kind='mergesort')]
+            noisy_data = noisy_data[noisy_data[:,i].argsort(kind='mergesort')]
+    
+    num_observation = len(clean_data[:,0])
+    matches = 0
+
+    # print('clean sorted data: ', clean_data[:10, :], '\n')
+    # print('noisy sorted data: ', noisy_data[:10, :], '\n')
+
+    for i in range(num_observation):
+        # print('clean: ', clean_data[i,-1], ' noisy: ', noisy_data[i,-1], '\n')
+        if clean_data[i,-1] == noisy_data[i,-1]:
+            matches += 1
+    print('Matches (%): ', matches / num_observation)
+    print('Incorrect observations in noisy data (%): ', 1 - (matches / num_observation), '\n')
 
 ######################################
 # Helpers for recursion
