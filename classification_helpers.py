@@ -138,6 +138,7 @@ def get_int_labels(str_labels):
 def concat_data_helper(data, labels):
     # Adds the labels as the last column of the dataset
     data_concat = np.concatenate((data, np.expand_dims(labels, axis=0).T), axis=1) 
+    data_concat = data_concat.astype(np.int64) # For some reason, the line above changes labels to a np.float64. This changes the whole array into int64
     return data_concat
 
 
@@ -149,7 +150,7 @@ def suggest_split_points(attribute_index, data):
 
     suggestions = []
     for row in range(1, len(data_sorted[:,attribute_index])): # starting at 1 because comparing to row - 1; going through all the rows
-        if data_sorted[row, -1] != data_sorted[row-1, -1] :  # True if the labels are different, or if the attribute value are different
+        if data_sorted[row, -1] != data_sorted[row-1, -1] or data_sorted[row, attribute_index] != data_sorted[row-1, attribute_index]:  # True if the labels are different, or if the attribute value are different
             candidate = (data_sorted[row, attribute_index] + data_sorted[row - 1, attribute_index]) / 2 #finding the value (avg of the two) at which to do the split
             if len(suggestions) == 0 or suggestions[-1] != candidate: #If suggestions is empty OR if the previous entry is not the same value, then append it
                 suggestions.append(candidate)
