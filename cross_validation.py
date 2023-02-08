@@ -1,7 +1,7 @@
 import classification_helpers as ch
 import numpy as np
 from classification import DecisionTreeClassifier
-from evalutation_functions import accuracy
+from evalutation_functions import accuracy, print_all_evaluation_metrics
 from numpy.random import default_rng
 from scipy.stats import mode
 
@@ -71,7 +71,7 @@ for i, (train_indices, test_indices) in enumerate(train_test_k_fold(n_folds, len
     x_test = x[test_indices, :]
     y_test = y[test_indices]
 
-    # Train the KNN (we'll use one nearest neighbour)
+    # Train the Decision Trees
     decision_tree_classifier = DecisionTreeClassifier()
     decision_tree_classifier.fit(x_train, y_train)
     predictions = decision_tree_classifier.predict(x_test)
@@ -83,6 +83,7 @@ for i, (train_indices, test_indices) in enumerate(train_test_k_fold(n_folds, len
 print(accuracies)
 print(accuracies.mean())
 print(accuracies.std())
+
 
 # Q3.3 Implementation
 (x_test, y_test, classes_test) = ch.read_dataset("data/test.txt")
@@ -104,5 +105,8 @@ modes, _ = mode(predictions, axis=1)
 final_predictions = modes
 # print(final_predictions)
 
-acc_results = accuracy(y_test, final_predictions)
-print(acc_results)
+# print(decision_trees[i].predict(x_test).shape)
+# print(final_predictions.shape)
+
+acc_results = accuracy(y_test, np.squeeze(final_predictions))
+# print(acc_results)
