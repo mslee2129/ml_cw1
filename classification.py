@@ -58,7 +58,7 @@ class DecisionTreeClassifier(object):
         
         # set a flag so that we know that the classifier has been trained
         self.is_trained = True
-        (self.decision_tree).recursive_print()
+        #(self.decision_tree).recursive_print()
         
     
     def predict(self, x):
