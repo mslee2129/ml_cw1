@@ -59,8 +59,10 @@ def train_and_predict(x_train, y_train, x_test, x_val, y_val):
 
     # Creating multiple decision trees to find optimal depth
     decision_trees = []
-    for max_depth in range(1,15): #choose the value here
-        decision_trees.append(ch.create_decision_tree(data, max_depth))
+    decision_trees.append(ch.create_decision_tree(data))
+    #for max_depth in range(12,13): #choose the value here
+        # I ran it until max_depth = 25. 12 was still the best
+        #decision_trees.append(ch.create_decision_tree(data, max_depth))
 
     # Compute the accuracy of each decision tree to find out which is the best
     accuracies = []
@@ -79,19 +81,27 @@ def train_and_predict(x_train, y_train, x_test, x_val, y_val):
     predictions = np.zeros((x_val.shape[0],), dtype=np.object_)    
     for index in range(x_val.shape[0]): #Going through every value we want to predict
         predictions[index] = ch.predict_value(decision_trees[best_tree_index], x_val[index])
-    print("predictions", predictions)
+    #print("predictions", predictions)
     print("OYÉ OYÉ OYÉ BEHOLD THE EVALUATION METRIC OF THE *UN*PRUNED TREE, WITH OPTIMAL DEPTH")
-    print("The best depth is: ", best_tree_index) # TO REMOVE
+    #print("The best depth is: ", best_tree_index) # TO REMOVE
     print_all_evaluation_metrics(y_val, predictions)
     
     
     # Now, Prune the best_tree
     ## !!!! PEWdiepie PEW PEW NEED TO UPDATE PRUNE AND REMOVE THE FIRST PARAMETER
-    pruned_tree = prune(decision_trees[best_tree_index], decision_trees[best_tree_index], max_accuracy, y_val, x_val)
+    print(id(decision_trees[best_tree_index]))
+    
+    #pruned_tree, pr_accuracy = prune(decision_trees[best_tree_index], max_accuracy, y_val, x_val)
+    #print("return accuracy:", pr_accuracy)
+
+    pruned_tree = prune(decision_trees[best_tree_index], max_accuracy, y_val, x_val)
+    
     pruned_predictions = np.zeros((x_val.shape[0],), dtype=np.object_)    
     for index in range(x_val.shape[0]): #Going through every value we want to predict
         pruned_predictions[index] = ch.predict_value(pruned_tree, x_val[index])
-    print(pruned_predictions)
+    
+    print("predictions",pruned_predictions)
+    
     print("OYÉ OYÉ OYÉ BEHOLD THE EVALUATION METRIC OF THE PRUNED TREE, WITH OPTIMAL DEPTH")
     print("The best depth is: ", best_tree_index) # TO REMOVE
     print_all_evaluation_metrics(y_val,pruned_predictions)
@@ -102,11 +112,11 @@ def train_and_predict(x_train, y_train, x_test, x_val, y_val):
 
     # set up an empty (M, ) numpy array to store the predicted labels 
     # feel free to change this if needed
-    predictions = np.zeros((x_test.shape[0],), dtype=np.object_)
+    #predictions = np.zeros((x_test.shape[0],), dtype=np.object_)
         
     # TODO: Make predictions on x_test using new classifier        
         
     # remember to change this if you rename the variable
-    return predictions
+    #return predictions
 
 

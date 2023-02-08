@@ -317,6 +317,7 @@ def create_decision_tree(dataset, max_depth = 10000, depth = -1):
     labels = dataset[:,- 1] #labels column is the last one
 
     if depth == max_depth:
+        print("EXCEEDED MAX DEPTH")
         repartition = find_label_repartition(labels)
         return find_predominant_label(repartition)
     
@@ -354,7 +355,8 @@ def predict_value(decision_tree, data): # NEED TO IMPROVE THE 4 CASES -- *DRY*
                 return decision_tree.children[0]
 
         # CASE 2 of 4
-        if(data[decision_tree.attribute_index] >= decision_tree.split_index): # take right
+        else: # >=
+        #if(data[decision_tree.attribute_index] >= decision_tree.split_index): # take right
             if(isinstance(decision_tree.children[1], Node)): #if there is another branch
                 return predict_value(decision_tree.children[1], data)
             
@@ -372,7 +374,8 @@ def predict_value(decision_tree, data): # NEED TO IMPROVE THE 4 CASES -- *DRY*
                 return decision_tree.children[0]
         
          # CASE 4 of 4
-        if(data[decision_tree.attribute_index] > decision_tree.split_index): # take right
+        else: # >
+        #if(data[decision_tree.attribute_index] > decision_tree.split_index): # take right
             if(isinstance(decision_tree.children[1], Node)): #if there is another branch
                 return predict_value(decision_tree.children[1], data)
             
