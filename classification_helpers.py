@@ -161,18 +161,18 @@ def suggest_split_points(attribute_index, data):
 
 
 def find_optimal_node(data):
-    optimal_node = (0, 0, 0) # optimal_node = (index, split value, split flag)
+    optimal_node = (0, 0, 0, 0, 0) # optimal_node = (index, split value, split flag, num_instances_left, num_instances_right)
     max_information_gain = -1 
 
     for i in range(len(data[0]) - 1): # loop through attributes # -1 since you want to exclude the label column
 
         for split_point in suggest_split_points(i, data): # loop through suggested split points
-            information_gain, split_flag = find_information_gain(data, split_point, i)
+            information_gain, split_flag, num_instances_left, num_instances_right = find_information_gain(data, split_point, i)
 
             #print("Hey Hey, I am trying to find the information gain of split point", split_point, "on attribute", i, "and i found", information_gain)
             
             if information_gain > max_information_gain: #if it is the new max, update optimal_nove and the max value
-                optimal_node = (i, split_point, split_flag) 
+                optimal_node = (i, split_point, split_flag, num_instances_left, num_instances_right) 
                 max_information_gain = information_gain
 
     #print("The optimal node is: ", optimal_node, "with information gain:", max_information_gain)
@@ -223,7 +223,7 @@ def find_information_gain(dataset, split_index, attribute_index): # attribute-va
     
     information_gain = entropy_pre_split - entropy_weighted_average
 
-    return (information_gain, split_flag)
+    return (information_gain, split_flag, len(labels_left), len(labels_right))
 
 
 def make_split(dataset, split_info):
@@ -246,10 +246,12 @@ def make_split(dataset, split_info):
 
 class Node:
     def __init__(self, optimal_node):
-        attribute_index, split_index, split_flag = optimal_node
+        attribute_index, split_index, split_flag, num_instances_left, num_instances_right = optimal_node
         self.attribute_index = attribute_index
         self.split_index = split_index
         self.split_flag = split_flag
+        self.num_instances_left = num_instances_left
+        self.num_instances_right = num_instances_right
         self.children = [None, None]
     
     def add_child(self, node, i):
@@ -273,29 +275,19 @@ class Node:
      
 
 def create_decision_tree(dataset):
-    cols = np.shape(dataset)[1]
     labels = dataset[:,- 1] #labels column is the last one
-    
-    #print("Dataset :", dataset)
-    #print("Labels :", labels)
-    #print(len(np.unique(labels)))
-    #print(len(np.unique((dataset[:,:-1]), axis=0)))
-
-    # Below should no longer be required
-    #if len(np.unique(labels)) == 0: # this technically should be caught elsewhere...
-    #    print("I should've exited elsewhere")
-    #    return
 
     if len(np.unique(labels)) == 1 or len(np.unique((dataset[:,:-1]), axis=0)) == 1: # if only one type of label left or they all have the same attributes
-        # print("Leaf found")
         return labels[0] # Meaning that all leafs return here.
 
-    #print("I wasn't caught")
-
     optimal_node = find_optimal_node(dataset) 
+    
     node = Node(optimal_node) # creating a new node
-    children_datasets = make_split(dataset, optimal_node)
-   
+
+    #unpacking because make_split only needs the first three elements
+    attribute_index, split_index, split_flag, num_instances_left, num_instances_right = optimal_node
+
+    children_datasets = make_split(dataset, (attribute_index, split_index, split_flag))
     for i in range(len(children_datasets)): # 0 or 1
         child_node = create_decision_tree(children_datasets[i])
   

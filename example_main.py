@@ -11,7 +11,8 @@ import classification_helpers as ch
 from classification import DecisionTreeClassifier # COMMENTED BY US
 from improvement import train_and_predict
 from evalutation_functions import print_all_evaluation_metrics
-
+from evalutation_functions import accuracy
+from pruning import prune
 if __name__ == "__main__":
 
     # ############# QUESTION 1 #######################
@@ -48,6 +49,13 @@ if __name__ == "__main__":
     #tree = ch.create_decision_tree(data)
     #tree.recursive_print()
     
+    print("PRUNING!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
+    pruned_classifier = DecisionTreeClassifier()
+    # WE NEED TO CHANGE THIS CAUSE I AM PRUNING ON THE TEST SET
+    pruned_classifier = prune(classifier, classifier.decision_tree, accuracy(y_test, predictions), y_test, x_test) 
+    new_predictions = pruned_classifier.predict(x_test)
+    print_all_evaluation_metrics(y_test, new_predictions)
+
     """
     print("Loading the training dataset...");
     x = np.array([
