@@ -1,5 +1,6 @@
 import numpy as np
 from math import log2
+import math
 import matplotlib.pyplot as plt
 
 ######################################
@@ -161,18 +162,18 @@ def suggest_split_points(attribute_index, data):
 
 
 def find_optimal_node(data):
-    optimal_node = (0, 0, 0, 0, 0) # optimal_node = (index, split value, split flag, num_instances_left, num_instances_right)
+    optimal_node = (0, 0, 0, [], []) # optimal_node = (index, split value, split flag, label_repartition_left, label_repartition_right)
     max_information_gain = -1 
 
     for i in range(len(data[0]) - 1): # loop through attributes # -1 since you want to exclude the label column
 
         for split_point in suggest_split_points(i, data): # loop through suggested split points
-            information_gain, split_flag, num_instances_left, num_instances_right = find_information_gain(data, split_point, i)
+            information_gain, split_flag, label_repartition_left, label_repartition_right = find_information_gain(data, split_point, i)
 
             #print("Hey Hey, I am trying to find the information gain of split point", split_point, "on attribute", i, "and i found", information_gain)
             
             if information_gain > max_information_gain: #if it is the new max, update optimal_nove and the max value
-                optimal_node = (i, split_point, split_flag, num_instances_left, num_instances_right) 
+                optimal_node = (i, split_point, split_flag, label_repartition_left, label_repartition_right) 
                 max_information_gain = information_gain
 
     #print("The optimal node is: ", optimal_node, "with information gain:", max_information_gain)
@@ -215,6 +216,10 @@ def find_information_gain(dataset, split_index, attribute_index): # attribute-va
     labels_left = children_datasets[0][:,-1] # keeping only the labels column of the left dataset
     labels_right = children_datasets[1][:,-1] # keeping only the labels column of the right dataset
 
+    # Finding the repartition of labels in the two datasets
+    label_repartition_left = find_label_repartition(labels_left)
+    label_repartition_right = find_label_repartition(labels_right)
+    
     entropy_left = find_entropy(labels_left)
     entropy_right = find_entropy(labels_right)  
 
@@ -223,7 +228,27 @@ def find_information_gain(dataset, split_index, attribute_index): # attribute-va
     
     information_gain = entropy_pre_split - entropy_weighted_average
 
-    return (information_gain, split_flag, len(labels_left), len(labels_right))
+    return (information_gain, split_flag, label_repartition_left, label_repartition_right)
+
+
+
+def find_label_repartition(label_array):
+    label_repartition = []
+    for label in label_array:
+        found = False
+
+        for sublist in label_repartition:
+            # sublist = [label number, number iterations]
+            if sublist[0] == label:
+                sublist[1] += 1
+                found = True
+        
+        if not found:
+            # appending a sublist with label number and iteration 1
+            label_repartition.append([label, 1])
+    
+    return label_repartition
+
 
 
 def make_split(dataset, split_info):
@@ -246,12 +271,12 @@ def make_split(dataset, split_info):
 
 class Node:
     def __init__(self, optimal_node):
-        attribute_index, split_index, split_flag, num_instances_left, num_instances_right = optimal_node
+        attribute_index, split_index, split_flag, label_repartition_left, label_repartition_right = optimal_node
         self.attribute_index = attribute_index
         self.split_index = split_index
         self.split_flag = split_flag
-        self.num_instances_left = num_instances_left
-        self.num_instances_right = num_instances_right
+        self.label_repartition_left = label_repartition_left
+        self.label_repartition_right = label_repartition_right
         self.children = [None, None]
     
     def add_child(self, node, i):
@@ -274,9 +299,27 @@ class Node:
                 print("Children: %i has label" % (i), self.children[i])
      
 
-def create_decision_tree(dataset):
+def find_predominant_label(list_of_lists):
+    # loop through label_repartition_full to find the maximum value, and it's associated label
+        max_value = -1
+        max_label = -1
+        for sublist in list_of_lists:
+            if(sublist[1] > max_value):
+                max_value = sublist[1]
+                max_label = sublist[0]
+
+        return max_label
+
+def create_decision_tree(dataset, max_depth = 10000, depth = -1):
+    # Update depth
+    depth += 1 #Root is depth 0
+    
     labels = dataset[:,- 1] #labels column is the last one
 
+    if depth == max_depth:
+        repartition = find_label_repartition(labels)
+        return find_predominant_label(repartition)
+    
     if len(np.unique(labels)) == 1 or len(np.unique((dataset[:,:-1]), axis=0)) == 1: # if only one type of label left or they all have the same attributes
         return labels[0] # Meaning that all leafs return here.
 
@@ -285,11 +328,11 @@ def create_decision_tree(dataset):
     node = Node(optimal_node) # creating a new node
 
     #unpacking because make_split only needs the first three elements
-    attribute_index, split_index, split_flag, num_instances_left, num_instances_right = optimal_node
+    attribute_index, split_index, split_flag, label_repartition_left, label_repartition_right = optimal_node
 
     children_datasets = make_split(dataset, (attribute_index, split_index, split_flag))
     for i in range(len(children_datasets)): # 0 or 1
-        child_node = create_decision_tree(children_datasets[i])
+        child_node = create_decision_tree(children_datasets[i], max_depth, depth)
   
         node.add_child(child_node,i) # adding the child nodes to the node created earlier.
     

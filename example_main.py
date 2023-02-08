@@ -13,6 +13,7 @@ from improvement import train_and_predict
 from evalutation_functions import print_all_evaluation_metrics
 from evalutation_functions import accuracy
 from pruning import prune
+
 if __name__ == "__main__":
 
     # ############# QUESTION 1 #######################
@@ -35,16 +36,24 @@ if __name__ == "__main__":
 
 
     ############### QUESTION 2 ###############
+
+    print("---- Welcome to Wonderland ----")
+    print("---- Loading training dataset ----")
     x,y,c  = ch.read_dataset("./data/train_full.txt")
-    # print(type(y[0])) of type numpy int.64
     data = ch.concat_data_helper(x,y)   
     
-    classifier = DecisionTreeClassifier()
-    classifier.fit(x, y)
-
-    x_test,y_test,c_test  = ch.read_dataset("./data/test.txt")
-
-    predictions = classifier.predict(x_test)    
+    print("---- Loading validation dataset ----")
+    x_validation, y_validation, c_validation  = ch.read_dataset("./data/validation.txt")
+    
+    print("---- Loading testing dataset ----")
+    x_test, y_test, class_test  = ch.read_dataset("./data/test.txt")
+    
+    print("---- Launching train and predict ----")
+    predicitions = train_and_predict(x,y,x_test, x_validation, y_validation)
+    
+    """"
+    print("---- Loading dataset ----")
+    x,y,c  = ch.read_dataset("./data/train_full.txt")
     print_all_evaluation_metrics(y_test, predictions)
     #tree = ch.create_decision_tree(data)
     #tree.recursive_print()
@@ -56,6 +65,7 @@ if __name__ == "__main__":
     new_predictions = pruned_classifier.predict(x_test)
     print_all_evaluation_metrics(y_test, new_predictions)
 
+    """
     """
     print("Loading the training dataset...");
     x = np.array([

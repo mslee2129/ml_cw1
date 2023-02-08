@@ -18,13 +18,13 @@ def print_all_evaluation_metrics(str_y_gold, y_prediction):
     recc_results, macro_recc = recall(y_gold, y_prediction, matrix)
     f1_results, macro_f1 = f1_score(y_gold, y_prediction, matrix)
 
-    print("\n Confusion matrix:", matrix, "\n")
+    print("\n Confusion matrix:\n", matrix, "\n")
 
     print("Precision results per label type:", prec_results)
     print("Recall results per label type:", recc_results)
     print("F1 results per label type:", f1_results)
     
-    print("\nAccuray results:", acc_results)  
+    print("\nAccuracy results:", acc_results)  
     print("Macro Precision:", macro_prec)
     print("Macro Recall:", macro_recc)
     print("Macro F1:", macro_f1)
