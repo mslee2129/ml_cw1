@@ -41,7 +41,7 @@ if __name__ == "__main__":
     classifier = DecisionTreeClassifier()
     classifier.fit(x, y)
 
-    x_test,y_test,c_test  = ch.read_dataset("./data/validation.txt")
+    x_test,y_test,c_test  = ch.read_dataset("./data/test.txt")
 
     predictions = classifier.predict(x_test)    
     print_all_evaluation_metrics(y_test, predictions)
