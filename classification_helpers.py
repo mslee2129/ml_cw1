@@ -100,6 +100,62 @@ def examine_dataset (x ,y, classes, dataset_name = ""):
     plt.savefig(file_name)
     plt.clf() # Clears the figure so the graphs don't overlap in the saved file
 
+
+def graph_compare_full_noisy(x_full, y_full, classes, x_noisy, y_noisy):
+
+    """ ------------  Number of instances  ---------------- """
+    # Finding the number of instances of each class
+    num_classes = classes.size
+    full = [0] *  num_classes
+    for i in range(len(y_full)):
+        full[y_full[i]] += 1
+
+    noisy = [0] *  num_classes
+    for i in range(len(y_noisy)):
+        noisy[y_noisy[i]] += 1
+
+    # Showing a graphical representation of the distribution (#) of observations by classes
+    X = np.arange(6)
+    fig = plt.figure()
+    # ax = fig.add_axes([0,0,1,1])
+    ax = fig.add_subplot(111)
+    ax.bar(X+0.0, full, color = 'b', width = 0.25)
+    ax.bar(X+0.25, noisy, color = 'g', width = 0.25)
+    ax.set_yticks(np.arange(0,1000,100))
+    ax.set_ylabel('Observation count')
+    ax.set_xlabel('Class')
+    ax.legend(labels=['train_full', 'train_noisy'])
+    title_str = "Number of observation per classes."
+    # plt.show()
+    file_name = "graphs/FULLNOISYCOMPARISONRATIO" 
+    plt.savefig(file_name)
+    plt.clf() # Clears the figure so the graphs don't overlap in the saved file
+
+    """ ------------  RATIO  ---------------- """
+    # Getting the ratio of each class
+    ratio_FULL = [0] * num_classes
+    print("Ratio of each class: \n")
+    for i in range(num_classes):
+        ratio_FULL[i] = float(full[i]/len(y_full)) * 100
+
+    ratio_NOISY = [0] * num_classes
+    print("Ratio of each class: \n")
+    for i in range(num_classes):
+        ratio_NOISY[i] = float(noisy[i]/len(y_noisy)) * 100
+
+    # Showing a graphical representation of the distribution (#) of observations by classes
+    plt.bar(range(num_classes), full, )
+    plt.bar(range(num_classes), noisy, )
+    title_str = "Proportion of each class"
+    plt.title(title_str)
+    plt.xlabel('Class number')
+    plt.ylabel('Ratio')
+    # plt.show()
+    file_name = "graphs/FULLNOISYCOMPARISON" 
+    plt.savefig(file_name)
+    plt.clf() # Clears the figure so the graphs don't overlap in the saved file
+
+
 def noisy_data_comparison(clean_data, noisy_data):
     # sort both arrays by attributes, not the label
     # we then iterate through the classes to see which observations differ
