@@ -70,7 +70,7 @@ def examine_dataset (x ,y, classes, dataset_name = ""):
     for i in range(num_classes):
         print("Class", i, ":", round(l[i]))
     
-    # Showing a graphical representation of the repartition (#) of observations by classes
+    # Showing a graphical representation of the distribution (#) of observations by classes
     plt.bar(range(num_classes), l, )
     title_str = "Number of observation per classes. Dataset: " + dataset_name
     plt.title(title_str)
@@ -89,7 +89,7 @@ def examine_dataset (x ,y, classes, dataset_name = ""):
         ratio[i] = float(l[i]/len(y)) * 100
         print("Class", i, ":", round(ratio[i]), "%")
 
-    # Showing a graphical representation of the repartition (%) of observations by classes
+    # Showing a graphical representation of the distribution (%) of observations by classes
     plt.bar(range(num_classes), ratio, )
     title_str = "Ratio of dataset: " + dataset_name
     plt.title(title_str)
@@ -180,8 +180,9 @@ def suggest_split_points(attribute_index, data):
     # starting at 1 because comparing to row - 1; going through all the rows
     for row in range(1, len(data_sorted[:,attribute_index])): 
         
-        # True if the labels are different, or if the attribute value are different
-        if data_sorted[row, -1] != data_sorted[row-1, -1] or data_sorted[row, attribute_index] != data_sorted[row-1, attribute_index]:  
+        # True [if the labels are different, or] if the attribute value are different
+        # if data_sorted[row, -1] != data_sorted[row-1, -1] or data_sorted[row, attribute_index] != data_sorted[row-1, attribute_index]:  
+        if data_sorted[row, attribute_index] != data_sorted[row-1, attribute_index]:  
             #finding the value (avg of the two) at which to do the split
             candidate = (data_sorted[row, attribute_index] + data_sorted[row - 1, attribute_index]) / 2 
             
@@ -195,8 +196,8 @@ def suggest_split_points(attribute_index, data):
 
 
 def find_optimal_node(data):
-    # optimal_node = (attribute_index, split value, split flag, label_repartition_left, label_repartition_right)
-    optimal_node = (0, 0, 0, [], []) 
+    # optimal_node = (attribute_index, split value, label_distribution_left, label_distribution_right)
+    optimal_node = (0, 0, [], []) 
     max_information_gain = -1 
 
     # loop through attributes # -1 since you want to exclude the label column
@@ -204,11 +205,11 @@ def find_optimal_node(data):
 
         # loop through suggested split points
         for split_point in suggest_split_points(i, data): 
-            information_gain, split_flag, label_repartition_left, label_repartition_right = find_information_gain(data, split_point, i)
+            information_gain, label_distribution_left, label_distribution_right = find_information_gain(data, split_point, i)
             
             #if it is the new max, update optimal_nove and the max value
             if information_gain > max_information_gain: 
-                optimal_node = (i, split_point, split_flag, label_repartition_left, label_repartition_right) 
+                optimal_node = (i, split_point, label_distribution_left, label_distribution_right) 
                 max_information_gain = information_gain
 
     return optimal_node
@@ -231,27 +232,22 @@ def find_entropy(class_labels):
     return entropy
 
 
-def find_information_gain(dataset, split_index, attribute_index): # attribute-values = x; labels = y
+def find_information_gain(dataset, split_value, attribute_index): # attribute-values = x; labels = y
 
     labels = dataset[:, -1] # Here we are only selecting the labels column (last one)
   
     entropy_pre_split = find_entropy(labels)
     
-    # If I find the split value in the dataset, I need to check for both cutting above and below that value
-    loop = 1
-    if split_index in dataset[:, attribute_index]:
-        loop = 2
-
-    for split_flag in range(loop): #loop can be 1 or 2, meaning split_flag can be 0 or 1
-        split_info = (attribute_index,split_index,split_flag)
-        children_datasets = make_split(dataset, split_info)
+    
+    split_info = (attribute_index,split_value) # POTENTIALLY remove split_info towards THE END
+    children_datasets = make_split(dataset, split_info)
 
     labels_left = children_datasets[0][:,-1] # keeping only the labels column of the left dataset
     labels_right = children_datasets[1][:,-1] # keeping only the labels column of the right dataset
 
-    # Finding the repartition of labels in the two datasets
-    label_repartition_left = find_label_repartition(labels_left)
-    label_repartition_right = find_label_repartition(labels_right)
+    # Finding the distribution of labels in the two datasets
+    label_distribution_left = create_label_distribution_table(labels_left)
+    label_distribution_right = create_label_distribution_table(labels_right)
     
     entropy_left = find_entropy(labels_left)
     entropy_right = find_entropy(labels_right)  
@@ -261,16 +257,16 @@ def find_information_gain(dataset, split_index, attribute_index): # attribute-va
     
     information_gain = entropy_pre_split - entropy_weighted_average
 
-    return (information_gain, split_flag, label_repartition_left, label_repartition_right)
+    return (information_gain, label_distribution_left, label_distribution_right)
 
 
 
-def find_label_repartition(label_array):
-    label_repartition = []
+def create_label_distribution_table(label_array):
+    label_distribution = []
     for label in label_array:
         found = False
 
-        for sublist in label_repartition:
+        for sublist in label_distribution:
             # sublist = [label number, number iterations]
             if sublist[0] == label:
                 sublist[1] += 1
@@ -278,25 +274,18 @@ def find_label_repartition(label_array):
         
         if not found:
             # appending a sublist with label number and iteration 1
-            label_repartition.append([label, 1])
+            label_distribution.append([label, 1])
     
-    return label_repartition
+    return label_distribution
 
 
 
 def make_split(dataset, split_info):
 
-    attribute_index, split_index, split_flag = split_info
-    if split_flag: # Cutting above the value (ex.: 1,2,3,4,5; split above 3 means you have [1,2], [3,4,5])
-        data_left = dataset[dataset[:,attribute_index] < split_index]
-        data_right = dataset[dataset[:,attribute_index] >= split_index]
-        return [data_left, data_right]
-    
-    # DEFAULT: Cutting below the value (ex.: 1,2,3,4,5; split below 3 means you have [1,2,3], [4,5])
-    data_left = dataset[dataset[:,attribute_index] <= split_index]
-    data_right = dataset[dataset[:,attribute_index] > split_index]
+    attribute_index, split_value = split_info
+    data_left = dataset[dataset[:,attribute_index] < split_value]
+    data_right = dataset[dataset[:,attribute_index] >= split_value]
     return [data_left, data_right]
-
 
 ######################################
 # RECURSION
@@ -304,22 +293,18 @@ def make_split(dataset, split_info):
 
 class Node:
     def __init__(self, optimal_node):
-        attribute_index, split_index, split_flag, label_repartition_left, label_repartition_right = optimal_node
+        attribute_index, split_value, label_distribution_left, label_distribution_right = optimal_node
         self.attribute_index = attribute_index
-        self.split_index = split_index
-        self.split_flag = split_flag
-        self.label_repartition_left = label_repartition_left
-        self.label_repartition_right = label_repartition_right
+        self.split_value = split_value
+        self.label_distribution_left = label_distribution_left
+        self.label_distribution_right = label_distribution_right
         self.children = [None, None]
     
     def add_child(self, node, i):
         self.children[i] = node
 
     def __str__(self):
-        split_point = "below"
-        if self.split_flag:
-            split_point = "above"
-        return ("\n Split is happening on attribute: % a, " %self.attribute_index + split_point +  " value: %i \n" % self.split_index)
+        return ("\n Split is happening on attribute: % a, " %self.attribute_index +  " below value: %i \n" % self.split_value)
     
     def recursive_print(self):
         print(self)
@@ -333,7 +318,7 @@ class Node:
      
 
 def find_predominant_label(list_of_lists):
-    # loop through label_repartition_full to find the maximum value, and it's associated label
+    # loop through label_distribution_full to find the maximum value, and it's associated label
         max_value = -1
         max_label = -1
         for sublist in list_of_lists:
@@ -351,21 +336,22 @@ def create_decision_tree(dataset, max_depth = 10000, depth = -1):
 
     if depth == max_depth:
         print("EXCEEDED MAX DEPTH")
-        repartition = find_label_repartition(labels)
-        return find_predominant_label(repartition)
+        distribution = create_label_distribution_table(labels)
+        return find_predominant_label(distribution)
     
     # if only one type of label left or they all have the same attributes
     if len(np.unique(labels)) == 1 or len(np.unique((dataset[:,:-1]), axis=0)) == 1: 
-        return labels[0] # Meaning that all leafs return here.
+        distribution = create_label_distribution_table(labels)
+        return find_predominant_label(distribution)
 
     optimal_node = find_optimal_node(dataset) 
     
     node = Node(optimal_node) # creating a new node
 
     #unpacking because make_split only needs the first three elements
-    attribute_index, split_index, split_flag, label_repartition_left, label_repartition_right = optimal_node
+    attribute_index, split_value, label_distribution_left, label_distribution_right = optimal_node
 
-    children_datasets = make_split(dataset, (attribute_index, split_index, split_flag))
+    children_datasets = make_split(dataset, (attribute_index, split_value))
     for i in range(len(children_datasets)): # 0 or 1
         child_node = create_decision_tree(children_datasets[i], max_depth, depth)
   
@@ -378,41 +364,20 @@ def create_decision_tree(dataset, max_depth = 10000, depth = -1):
 # PREDICTION
 ######################################
 
-def predict_value(decision_tree, data): # NEED TO IMPROVE THE 4 CASES -- *DRY*
-    if(decision_tree.split_flag): #If the split is happening *above*
+def predict_value(decision_tree, data): 
+    # CASE 1 of 2
+    if(data[decision_tree.attribute_index] < decision_tree.split_value): # take left
+        if(isinstance(decision_tree.children[0], Node)): #if there is another branch
+            return predict_value(decision_tree.children[0], data)
         
-        # CASE 1 of 4
-        if(data[decision_tree.attribute_index] < decision_tree.split_index): # take left
-            if(isinstance(decision_tree.children[0], Node)): #if there is another branch
-                return predict_value(decision_tree.children[0], data)
-            
-            else: # if it is a leaf, return the predicted value
-                return decision_tree.children[0]
+        else: # if it is a leaf, return the predicted value
+            return decision_tree.children[0]
 
-        # CASE 2 of 4
-        else: # >=
-        #if(data[decision_tree.attribute_index] >= decision_tree.split_index): # take right
-            if(isinstance(decision_tree.children[1], Node)): #if there is another branch
-                return predict_value(decision_tree.children[1], data)
-            
-            else: # if it is a leaf, return the predicted value
-                return decision_tree.children[1]
-    
-    # Below is actually the default case, if we're not cutting on a value contained in the set
-    else: # if the split is happening *below*, meaning if the value is smaller we take the right branch
-        # CASE 3 of 4
-        if(data[decision_tree.attribute_index] <= decision_tree.split_index):
-            if(isinstance(decision_tree.children[0], Node)): #if there is another branch
-                return predict_value(decision_tree.children[0], data)
-            
-            else: # if it is a leaf, return the predicted value
-                return decision_tree.children[0]
+    # CASE 2 of 2
+    else: # >=
+    #if(data[decision_tree.attribute_index] >= decision_tree.split_value): # take right
+        if(isinstance(decision_tree.children[1], Node)): #if there is another branch
+            return predict_value(decision_tree.children[1], data)
         
-         # CASE 4 of 4
-        else: # >
-        #if(data[decision_tree.attribute_index] > decision_tree.split_index): # take right
-            if(isinstance(decision_tree.children[1], Node)): #if there is another branch
-                return predict_value(decision_tree.children[1], data)
-            
-            else: # if it is a leaf, return the predicted value
-                return decision_tree.children[1]
+        else: # if it is a leaf, return the predicted value
+            return decision_tree.children[1]
