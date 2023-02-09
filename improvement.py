@@ -57,42 +57,74 @@ def train_and_predict(x_train, y_train, x_test, x_val, y_val):
     y_train_int_labels = ch.get_int_labels(y_train)
     data = ch.concat_data_helper(x_train, y_train_int_labels)
 
-    # Creating multiple decision trees to find optimal depth
-    decision_trees = []
-    decision_trees.append(ch.create_decision_tree(data))
-    #for max_depth in range(12,13): #choose the value here
-        # I ran it until max_depth = 25. 12 was still the best
-        #decision_trees.append(ch.create_decision_tree(data, max_depth))
+    #######################################################################
+    #                FINDING BEST DEPTH FOR THE TREE
+    #######################################################################
 
-    # Compute the accuracy of each decision tree to find out which is the best
-    accuracies = []
-    for tree in decision_trees:
-        predictions = np.zeros((x_val.shape[0],), dtype=np.object_)    
-        for index in range(x_val.shape[0]): #Going through every value we want to predict
-            predictions[index] = ch.predict_value(tree, x_val[index])
+    # # Creating multiple decision trees to find optimal depth
+    # decision_trees = []
+    # decision_trees.append(ch.create_decision_tree(data))
+    # for max_depth in range(1,25): #choose the value here   
+    #    decision_trees.append(ch.create_decision_tree(data, max_depth))
 
-        # Find the accuracy of the prediction of this specific tree
-        accuracies.append(accuracy(y_val, predictions))
+    # # Compute the accuracy of each decision tree to find out which is the best
+    # accuracies = []
+    # for tree in decision_trees:
+    #     predictions = np.zeros((x_val.shape[0],), dtype=np.object_)    
+    #     for index in range(x_val.shape[0]): #Going through every value we want to predict
+    #         predictions[index] = ch.predict_value(tree, x_val[index])
 
-    # Find the maximum accuracy
-    max_accuracy = max(accuracies)
+    #     # Find the accuracy of the prediction of this specific tree
+    #     accuracies.append(accuracy(y_val, predictions))
 
-    # Find the best tree based on the best accuracy
-    best_tree_index = accuracies.index(max_accuracy)
+    # # Find the maximum accuracy
+    # max_accuracy = max(accuracies)
 
-    # Find the predictions of the tree with best depth, and print the evaluation metrics for it
+    # # Find the best tree based on the best accuracy
+    
+    # best_tree_index = accuracies.index(max_accuracy)
+    # print("The max depth of the best tree is:", best_tree_index+1)
+    # # Find the predictions of the tree with best depth, and print the evaluation metrics for it
+    # predictions = np.zeros((x_val.shape[0],), dtype=np.object_)    
+    # for index in range(x_val.shape[0]): #Going through every value we want to predict
+    #     predictions[index] = ch.predict_value(decision_trees[best_tree_index], x_val[index])
+    
+    # print_all_evaluation_metrics(y_val, predictions)
+
+    # decision_tree = decision_trees[best_tree_index]
+
+    
+
+
+    #######################################################################
+    #                DEPTH = 12
+    #######################################################################
+    # I ran it until max_depth = 25. Depth = 12 was the best tree
+    decision_tree = ch.create_decision_tree(data, 13)
+    
     predictions = np.zeros((x_val.shape[0],), dtype=np.object_)    
     for index in range(x_val.shape[0]): #Going through every value we want to predict
-        predictions[index] = ch.predict_value(decision_trees[best_tree_index], x_val[index])
-    
+        predictions[index] = ch.predict_value(decision_tree, x_val[index])
+
+    #Find the accuracy of the prediction of this specific tree
+    max_accuracy = accuracy(y_val, predictions)
+    print("PREDICTIONS ON VALIDATION")
     print_all_evaluation_metrics(y_val, predictions)
     
+     #  PREDICTING TEST VALUES
+    # print("PREDICTING TEST VALUES -- DEPTH TREE")
+    # test_predictions = np.zeros((x_test.shape[0],), dtype=np.object_)    
+    # for index in range(x_test.shape[0]): #Going through every value we want to predict
+    #     test_predictions[index] = ch.predict_value(decision_tree, x_test[index])
     
+    #return test_predictions
+
+    #######################################################################
+    #                            PRUNING
+    #######################################################################
     # Now, Prune the best_tree
     #pruned_tree, pr_accuracy = prune(decision_trees[best_tree_index], max_accuracy, y_val, x_val)
-    
-    # Pruning the best tree
-    pruned_tree = prune(decision_trees[best_tree_index], max_accuracy, y_val, x_val)
+    pruned_tree = prune(decision_tree, max_accuracy, y_val, x_val)
     
     # Finding the predictions of the best tree, and printing its evaluation metricx
     pruned_predictions = np.zeros((x_val.shape[0],), dtype=np.object_)    
@@ -103,15 +135,12 @@ def train_and_predict(x_train, y_train, x_test, x_val, y_val):
 
 
 
-    # TODO: Train new classifier
-
-    # set up an empty (M, ) numpy array to store the predicted labels 
-    # feel free to change this if needed
-    #predictions = np.zeros((x_test.shape[0],), dtype=np.object_)
-        
-    # TODO: Make predictions on x_test using new classifier        
-        
-    # remember to change this if you rename the variable
-    #return predictions
+    #  PREDICTING TEST VALUES
+    print("PREDICTING TEST VALUES")
+    test_predictions = np.zeros((x_test.shape[0],), dtype=np.object_)    
+    for index in range(x_test.shape[0]): #Going through every value we want to predict
+        test_predictions[index] = ch.predict_value(pruned_tree, x_test[index])
+    
+    return test_predictions
 
 

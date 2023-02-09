@@ -4,6 +4,7 @@ from classification_helpers import predict_value
 from classification import DecisionTreeClassifier
 from evalutation_functions import accuracy
 from classification_helpers import find_predominant_label
+from classification_helpers import create_label_distribution_table
 ######################################
 # PRUNING
 ######################################
@@ -41,19 +42,17 @@ def prune(root_node, accuracy, true_labels, validation_set, node=None):
                 
     # If both children of the Node are labels:
     if(not isinstance(node.children[0], Node) and not isinstance(node.children[1], Node)):
+        repartition_left = create_label_distribution_table(node.label_distribution_left)
+        repartition_right = create_label_distribution_table(node.label_distribution_right)
+        
+        # now we need to join repartition_left and repartition_right
         label_repartition_full = []
-        for split_data in (node.label_repartition_left, node.label_repartition_right):
-            for i in range(len(split_data)):
-                found = False
-                for sublist in label_repartition_full:
-                    # sublist = [label number, number iterations]
-                    if sublist[0] == split_data[i][0]:
-                        sublist[1] += split_data[i][1]
-                        found = True
-                
-                if not found:
-                    # appending a sublist with label number and iteration 1
-                    label_repartition_full.append([split_data[i][0], split_data[i][1]])
+        for sublist in repartition_left:
+            label_repartition_full.append([sublist[0], sublist[1]])
+
+            for right_sublist in repartition_right:
+                if right_sublist[0] == sublist[0]: #if we're not comparing the two same labels
+                    label_repartition_full[-1][1] += right_sublist[1] #adding to full the value of the right subset
 
         return find_predominant_label(label_repartition_full)
         #return (find_predominant_label(label_repartition_full), -1)

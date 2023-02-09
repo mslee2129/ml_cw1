@@ -336,7 +336,7 @@ def create_decision_tree(dataset, max_depth = 10000, depth = -1):
     labels = dataset[:,- 1] #labels column is the last one
 
     if depth == max_depth:
-        print("EXCEEDED MAX DEPTH")
+        #print("EXCEEDED MAX DEPTH")
         distribution = create_label_distribution_table(labels)
         return find_predominant_label(distribution)
     
