@@ -182,7 +182,8 @@ def suggest_split_points(attribute_index, data):
         
         # True [if the labels are different, or] if the attribute value are different
         # if data_sorted[row, -1] != data_sorted[row-1, -1] or data_sorted[row, attribute_index] != data_sorted[row-1, attribute_index]:  
-        if data_sorted[row, attribute_index] != data_sorted[row-1, attribute_index]:  
+        # if data_sorted[row, attribute_index] != data_sorted[row-1, attribute_index]:  
+        if data_sorted[row, -1] != data_sorted[row-1, -1]:
             #finding the value (avg of the two) at which to do the split
             candidate = (data_sorted[row, attribute_index] + data_sorted[row - 1, attribute_index]) / 2 
             
@@ -340,7 +341,7 @@ def create_decision_tree(dataset, max_depth = 10000, depth = -1):
         return find_predominant_label(distribution)
     
     # if only one type of label left or they all have the same attributes
-    if len(np.unique(labels)) == 1 or len(np.unique((dataset[:,:-1]), axis=0)) == 1: 
+    if len(np.unique(labels)) == 1 or len(np.unique(labels)) == 0 or len(np.unique((dataset[:,:-1]), axis=0)) == 1: 
         distribution = create_label_distribution_table(labels)
         return find_predominant_label(distribution)
 
@@ -352,6 +353,14 @@ def create_decision_tree(dataset, max_depth = 10000, depth = -1):
     attribute_index, split_value, label_distribution_left, label_distribution_right = optimal_node
 
     children_datasets = make_split(dataset, (attribute_index, split_value))
+    # print('\nWe are splitting dataset: ', dataset)
+    # print('\n into: ')
+    # print(children_datasets[0])
+    # print('and \n')
+    # print(children_datasets[1])
+    if np.array_equal(children_datasets[0], dataset) or np.array_equal(children_datasets[1], dataset):
+        distribution = create_label_distribution_table(labels)
+        return find_predominant_label(distribution)
     for i in range(len(children_datasets)): # 0 or 1
         child_node = create_decision_tree(children_datasets[i], max_depth, depth)
   
