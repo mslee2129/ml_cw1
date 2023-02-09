@@ -127,7 +127,7 @@ def graph_compare_full_noisy(x_full, y_full, classes, x_noisy, y_noisy):
     ax.legend(labels=['train_full', 'train_noisy'])
     title_str = "Number of observation per classes."
     # plt.show()
-    file_name = "graphs/FULLNOISYCOMPARISONRATIO" 
+    file_name = "graphs/FULLNOISYCOMPARISONCOUNT" 
     plt.savefig(file_name)
     plt.clf() # Clears the figure so the graphs don't overlap in the saved file
 
@@ -143,15 +143,19 @@ def graph_compare_full_noisy(x_full, y_full, classes, x_noisy, y_noisy):
     for i in range(num_classes):
         ratio_NOISY[i] = float(noisy[i]/len(y_noisy)) * 100
 
-    # Showing a graphical representation of the distribution (#) of observations by classes
-    plt.bar(range(num_classes), full, )
-    plt.bar(range(num_classes), noisy, )
-    title_str = "Proportion of each class"
-    plt.title(title_str)
-    plt.xlabel('Class number')
-    plt.ylabel('Ratio')
+    X = np.arange(6)
+    fig = plt.figure()
+    # ax = fig.add_axes([0,0,1,1])
+    ax = fig.add_subplot(111)
+    ax.bar(X+0.0, ratio_FULL, color = 'b', width = 0.25)
+    ax.bar(X+0.25, ratio_NOISY, color = 'g', width = 0.25)
+    ax.set_yticks(np.arange(0,30,5))
+    ax.set_ylabel('Ratio (%)')
+    ax.set_xlabel('Class')
+    ax.legend(labels=['train_full', 'train_noisy'])
+    title_str = "Ratio of observation per classes."
     # plt.show()
-    file_name = "graphs/FULLNOISYCOMPARISON" 
+    file_name = "graphs/FULLNOISYCOMPARISONRATIO" 
     plt.savefig(file_name)
     plt.clf() # Clears the figure so the graphs don't overlap in the saved file
 

@@ -37,29 +37,35 @@ if __name__ == "__main__":
 
     ############### QUESTION 2 ###############
 
-    # # load the test set
-    # (x_test, y_test, classes_test) = ch.read_dataset("data/test.txt")
+    # load the test set
+    (x_test, y_test, classes_test) = ch.read_dataset("data/test.txt")
 
-    # print("\nTraining model on train_full")
-    # full_classifier = DecisionTreeClassifier()
-    # (x_full, y_full, classes_full) = ch.read_dataset("data/train_full.txt")
-    # full_classifier.fit(x_full, y_full)
-    # full_predictions = full_classifier.predict(x_test)
-    # print_all_evaluation_metrics(y_test, full_predictions)
+    print("\nTraining model on train_full")
+    full_classifier = DecisionTreeClassifier()
+    (x_full, y_full, classes_full) = ch.read_dataset("data/train_full.txt")
+    full_classifier.fit(x_full, y_full)
+    full_predictions = full_classifier.predict(x_test)
+    print_all_evaluation_metrics(y_test, full_predictions)
 
-    # print("\nTraining model on train_noisy")
-    # noisy_classifier = DecisionTreeClassifier()
-    # (x_noisy, y_noisy, classes_noisy) = ch.read_dataset("data/train_noisy.txt")
-    # noisy_classifier.fit(x_noisy, y_noisy)
-    # noisy_predictions = noisy_classifier.predict(x_test)
-    # print_all_evaluation_metrics(y_test, noisy_predictions)
+    print("\nTraining model on train_noisy")
+    noisy_classifier = DecisionTreeClassifier()
+    (x_noisy, y_noisy, classes_noisy) = ch.read_dataset("data/train_noisy.txt")
+    noisy_classifier.fit(x_noisy, y_noisy)
+    noisy_predictions = noisy_classifier.predict(x_test)
+    print_all_evaluation_metrics(y_test, noisy_predictions)
 
-    # print("\nTraining model on train_sub")
-    # sub_classifier = DecisionTreeClassifier()
-    # (x_sub, y_sub, classes_sub) = ch.read_dataset("data/train_sub.txt")
-    # sub_classifier.fit(x_sub, y_sub)
-    # sub_predictions = sub_classifier.predict(x_test)
-    # print_all_evaluation_metrics(y_test, sub_predictions)
+    print("\nTraining model on train_sub")
+    sub_classifier = DecisionTreeClassifier()
+    (x_sub, y_sub, classes_sub) = ch.read_dataset("data/train_sub.txt")
+    sub_classifier.fit(x_sub, y_sub)
+    sub_predictions = sub_classifier.predict(x_test)
+    print_all_evaluation_metrics(y_test, sub_predictions)
+
+
+    ch.graph_compare_full_noisy(x_full, y_full, classes_full, x_noisy, y_noisy)
+
+
+
 
     print("---- Welcome to Wonderland ----")
     print("---- Loading training dataset ----")
