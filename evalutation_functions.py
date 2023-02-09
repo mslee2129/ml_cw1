@@ -182,7 +182,7 @@ def f1_score(y_gold, y_prediction, matrix):
     f = np.zeros((len(precisions), ))
 
     for i in range(len(precisions)):
-      f[i] = (2 * precisions[i] * recalls[i] / (precisions[i] / recalls[i]))
+      f[i] = (2 * precisions[i] * recalls[i] / (precisions[i] + recalls[i]))
 
     # Compute the macro-averaged F1
     macro_f = np.sum(f) / len(f)
