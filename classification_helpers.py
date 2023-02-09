@@ -104,7 +104,8 @@ def noisy_data_comparison(clean_data, noisy_data):
     # sort both arrays by attributes, not the label
     # we then iterate through the classes to see which observations differ
 
-    # iteratively sort each attribute, see: https://opensourceoptions.com/blog/sort-numpy-arrays-by-columns-or-rows/#:~:text=NumPy%20arrays%20can%20be%20sorted,an%20array%20in%20ascending%20value.
+    # iteratively sort each attribute, see: 
+    # https://opensourceoptions.com/blog/sort-numpy-arrays-by-columns-or-rows/#:~:text=NumPy%20arrays%20can%20be%20sorted,an%20array%20in%20ascending%20value.
     # print('Num attributes: ', len(clean_data[0])-1)
     num_attributes = len(clean_data[0])-1
     for i in reversed(range(num_attributes)):
@@ -128,18 +129,44 @@ def noisy_data_comparison(clean_data, noisy_data):
     print('Matches (%): ', matches / num_observation)
     print('Incorrect observations in noisy data (%): ', 1 - (matches / num_observation), '\n')
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 ######################################
 # Helpers for recursion
 ######################################
 
-def get_int_labels(str_labels):
+def get_int_labels(str_labels): #Takes in string labels and returns an array with the int equivalents
     classes, int_labels = np.unique(str_labels, return_inverse = True)
     return int_labels
 
 def concat_data_helper(data, labels):
     # Adds the labels as the last column of the dataset
     data_concat = np.concatenate((data, np.expand_dims(labels, axis=0).T), axis=1) 
-    data_concat = data_concat.astype(np.int64) # For some reason, the line above changes labels to a np.float64. This changes the whole array into int64
+    # For some reason, the line above changes labels to a np.float64. 
+    # This changes the whole array into int64
+    data_concat = data_concat.astype(np.int64) 
     return data_concat
 
 
@@ -150,10 +177,16 @@ def suggest_split_points(attribute_index, data):
     data_sorted = data[data[:,attribute_index].argsort()]
 
     suggestions = []
-    for row in range(1, len(data_sorted[:,attribute_index])): # starting at 1 because comparing to row - 1; going through all the rows
-        if data_sorted[row, -1] != data_sorted[row-1, -1] or data_sorted[row, attribute_index] != data_sorted[row-1, attribute_index]:  # True if the labels are different, or if the attribute value are different
-            candidate = (data_sorted[row, attribute_index] + data_sorted[row - 1, attribute_index]) / 2 #finding the value (avg of the two) at which to do the split
-            if len(suggestions) == 0 or suggestions[-1] != candidate: #If suggestions is empty OR if the previous entry is not the same value, then append it
+    # starting at 1 because comparing to row - 1; going through all the rows
+    for row in range(1, len(data_sorted[:,attribute_index])): 
+        
+        # True if the labels are different, or if the attribute value are different
+        if data_sorted[row, -1] != data_sorted[row-1, -1] or data_sorted[row, attribute_index] != data_sorted[row-1, attribute_index]:  
+            #finding the value (avg of the two) at which to do the split
+            candidate = (data_sorted[row, attribute_index] + data_sorted[row - 1, attribute_index]) / 2 
+            
+            #If suggestions is empty OR if the previous entry is not the same value, then append it
+            if len(suggestions) == 0 or suggestions[-1] != candidate: 
                 suggestions.append(candidate)
     
     #print("Suggestions for attribute %a:" % attribute_index, suggestions)
@@ -162,21 +195,21 @@ def suggest_split_points(attribute_index, data):
 
 
 def find_optimal_node(data):
-    optimal_node = (0, 0, 0, [], []) # optimal_node = (index, split value, split flag, label_repartition_left, label_repartition_right)
+    # optimal_node = (attribute_index, split value, split flag, label_repartition_left, label_repartition_right)
+    optimal_node = (0, 0, 0, [], []) 
     max_information_gain = -1 
 
-    for i in range(len(data[0]) - 1): # loop through attributes # -1 since you want to exclude the label column
+    # loop through attributes # -1 since you want to exclude the label column
+    for i in range(len(data[0]) - 1): 
 
-        for split_point in suggest_split_points(i, data): # loop through suggested split points
+        # loop through suggested split points
+        for split_point in suggest_split_points(i, data): 
             information_gain, split_flag, label_repartition_left, label_repartition_right = find_information_gain(data, split_point, i)
-
-            #print("Hey Hey, I am trying to find the information gain of split point", split_point, "on attribute", i, "and i found", information_gain)
             
-            if information_gain > max_information_gain: #if it is the new max, update optimal_nove and the max value
+            #if it is the new max, update optimal_nove and the max value
+            if information_gain > max_information_gain: 
                 optimal_node = (i, split_point, split_flag, label_repartition_left, label_repartition_right) 
                 max_information_gain = information_gain
-
-    #print("The optimal node is: ", optimal_node, "with information gain:", max_information_gain)
 
     return optimal_node
 
@@ -311,8 +344,8 @@ def find_predominant_label(list_of_lists):
         return max_label
 
 def create_decision_tree(dataset, max_depth = 10000, depth = -1):
-    # Update depth
-    depth += 1 #Root is depth 0
+    # Update depth; root depth is 0
+    depth += 1
     
     labels = dataset[:,- 1] #labels column is the last one
 
@@ -321,7 +354,8 @@ def create_decision_tree(dataset, max_depth = 10000, depth = -1):
         repartition = find_label_repartition(labels)
         return find_predominant_label(repartition)
     
-    if len(np.unique(labels)) == 1 or len(np.unique((dataset[:,:-1]), axis=0)) == 1: # if only one type of label left or they all have the same attributes
+    # if only one type of label left or they all have the same attributes
+    if len(np.unique(labels)) == 1 or len(np.unique((dataset[:,:-1]), axis=0)) == 1: 
         return labels[0] # Meaning that all leafs return here.
 
     optimal_node = find_optimal_node(dataset) 
@@ -343,6 +377,7 @@ def create_decision_tree(dataset, max_depth = 10000, depth = -1):
 ######################################
 # PREDICTION
 ######################################
+
 def predict_value(decision_tree, data): # NEED TO IMPROVE THE 4 CASES -- *DRY*
     if(decision_tree.split_flag): #If the split is happening *above*
         

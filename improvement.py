@@ -75,35 +75,30 @@ def train_and_predict(x_train, y_train, x_test, x_val, y_val):
         accuracies.append(accuracy(y_val, predictions))
 
     # Find the maximum accuracy
-    print("accuracy", accuracies)
     max_accuracy = max(accuracies)
+
+    # Find the best tree based on the best accuracy
     best_tree_index = accuracies.index(max_accuracy)
+
+    # Find the predictions of the tree with best depth, and print the evaluation metrics for it
     predictions = np.zeros((x_val.shape[0],), dtype=np.object_)    
     for index in range(x_val.shape[0]): #Going through every value we want to predict
         predictions[index] = ch.predict_value(decision_trees[best_tree_index], x_val[index])
-    #print("predictions", predictions)
-    print("OYÉ OYÉ OYÉ BEHOLD THE EVALUATION METRIC OF THE *UN*PRUNED TREE, WITH OPTIMAL DEPTH")
-    #print("The best depth is: ", best_tree_index) # TO REMOVE
+    
     print_all_evaluation_metrics(y_val, predictions)
     
     
     # Now, Prune the best_tree
-    ## !!!! PEWdiepie PEW PEW NEED TO UPDATE PRUNE AND REMOVE THE FIRST PARAMETER
-    print(id(decision_trees[best_tree_index]))
-    
     #pruned_tree, pr_accuracy = prune(decision_trees[best_tree_index], max_accuracy, y_val, x_val)
-    #print("return accuracy:", pr_accuracy)
-
+    
+    # Pruning the best tree
     pruned_tree = prune(decision_trees[best_tree_index], max_accuracy, y_val, x_val)
     
+    # Finding the predictions of the best tree, and printing its evaluation metricx
     pruned_predictions = np.zeros((x_val.shape[0],), dtype=np.object_)    
     for index in range(x_val.shape[0]): #Going through every value we want to predict
         pruned_predictions[index] = ch.predict_value(pruned_tree, x_val[index])
     
-    print("predictions",pruned_predictions)
-    
-    print("OYÉ OYÉ OYÉ BEHOLD THE EVALUATION METRIC OF THE PRUNED TREE, WITH OPTIMAL DEPTH")
-    print("The best depth is: ", best_tree_index) # TO REMOVE
     print_all_evaluation_metrics(y_val,pruned_predictions)
 
 
