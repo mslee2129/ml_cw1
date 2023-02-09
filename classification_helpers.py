@@ -182,8 +182,8 @@ def suggest_split_points(attribute_index, data):
         
         # True [if the labels are different, or] if the attribute value are different
         # if data_sorted[row, -1] != data_sorted[row-1, -1] or data_sorted[row, attribute_index] != data_sorted[row-1, attribute_index]:  
-        # if data_sorted[row, attribute_index] != data_sorted[row-1, attribute_index]:  
-        if data_sorted[row, -1] != data_sorted[row-1, -1]:
+        if data_sorted[row, attribute_index] != data_sorted[row-1, attribute_index]:  
+        # if data_sorted[row, -1] != data_sorted[row-1, -1]:
             #finding the value (avg of the two) at which to do the split
             candidate = (data_sorted[row, attribute_index] + data_sorted[row - 1, attribute_index]) / 2 
             
