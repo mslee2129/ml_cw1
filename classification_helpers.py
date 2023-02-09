@@ -356,9 +356,11 @@ def create_decision_tree(dataset, max_depth = 10000, depth = -1):
     # print('\nWe are splitting dataset: ', dataset)
     # print('\n into: ')
     # print(children_datasets[0])
+    # if children_datasets[0].shape[0] == 0:
+    #     print("They are equal !!")
     # print('and \n')
     # print(children_datasets[1])
-    if np.array_equal(children_datasets[0], dataset) or np.array_equal(children_datasets[1], dataset):
+    if children_datasets[0].shape[0] == 0 or children_datasets[1].shape[0] == 0:
         distribution = create_label_distribution_table(labels)
         return find_predominant_label(distribution)
     for i in range(len(children_datasets)): # 0 or 1
