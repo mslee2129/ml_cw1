@@ -1,20 +1,13 @@
 import numpy as np
 import classification_helpers as ch
 from classification_helpers import Node
-from classification_helpers import predict_value
-from classification import DecisionTreeClassifier
+# from classification_helpers import predict_value
+# from classification import DecisionTreeClassifier
 from evalutation_functions import accuracy
 from classification_helpers import find_predominant_label
 from classification_helpers import create_label_distribution_table
 from scipy.stats import mode
-
-
-selected_attributes = []
-        while len(selected_attributes) < num_attributes_hyperparameter:
-            proposed_attribute = np.random.randint(0, num_attributes)
-            if proposed_attribute not in selected_attributes:
-                selected_attributes.append(proposed_attribute)
-
+from classification_helpers import find_optimal_node, make_split
 
 def create_forest_decision_tree(dataset, num_attributes_hyperparameter ,max_depth = 10000, depth = -1):
     # Update depth; root depth is 0
@@ -32,7 +25,20 @@ def create_forest_decision_tree(dataset, num_attributes_hyperparameter ,max_dept
         distribution = create_label_distribution_table(labels)
         return find_predominant_label(distribution)
 
-    optimal_node = find_optimal_node(dataset) 
+    # this part is specific to the random forest, we randomly select m attributes to select the split at the node
+    num_attributes = np.shape(dataset)[1] - 1 #-1 because we don't want to consider the label column
+    selected_attributes = []
+    while len(selected_attributes) < num_attributes_hyperparameter:
+        proposed_attribute = np.random.randint(0, num_attributes)
+        if proposed_attribute not in selected_attributes:
+            selected_attributes.append(proposed_attribute)
+    
+    subset = dataset[:,selected_attributes]
+    # returns type (i, split_point, label_distribution_left, label_distribution_right) 
+    optimal_node = find_optimal_node(subset)
+    # ensure optimal split point and attribute is extracted from function
+    optimal_node = (selected_attributes[optimal_node[0]],) + optimal_node[1:]
+
     
     node = Node(optimal_node) # creating a new node
 
@@ -51,7 +57,7 @@ def create_forest_decision_tree(dataset, num_attributes_hyperparameter ,max_dept
         distribution = create_label_distribution_table(labels)
         return find_predominant_label(distribution)
     for i in range(len(children_datasets)): # 0 or 1
-        child_node = create_decision_tree(children_datasets[i], max_depth, depth)
+        child_node = create_forest_decision_tree(children_datasets[i], num_attributes_hyperparameter, max_depth, depth)
   
         node.add_child(child_node,i) # adding the child nodes to the node created earlier.
     
@@ -59,7 +65,7 @@ def create_forest_decision_tree(dataset, num_attributes_hyperparameter ,max_dept
 
 
 
-def random_forest (dataset, n_trees, max_depth, true_labels, validation_set):
+def random_forest (dataset, testing_set, num_attributes_hyperparameter, num_trees_hyperparameter, max_depth = 10000):
     """ Hyperparameters:
     - number of trees in forests
     - number of random attributes to consider for each tree
@@ -69,29 +75,27 @@ def random_forest (dataset, n_trees, max_depth, true_labels, validation_set):
     - sample size = length of the dataset
     """
     np.random.seed(42) 
-    forest = []
     prediction_list = []
     sample_size = np.shape(dataset)[0]
-    
-    num_attributes = np.shape(dataset)[1] - 1 #-1 because we don't want to consider the label column
-    num_attributes_hyperparameter = np.floor(np.sqrt(num_attributes))
 
-    for numbers in range(n_trees):
+    for numbers in range(num_trees_hyperparameter):
         
         #bootstrapping the new_dataset which is made from a subset of the attributes
         indexes = np.random.choice(np.shape(dataset)[0], replace=True, size = sample_size)
         dataset = dataset[indexes,:]
 
-        tree = ch.create_forest_decision_tree(dataset, max_depth)
-        forest.append(tree)
+        # def create_forest_decision_tree(dataset, num_attributes_hyperparameter ,max_depth = 10000, depth = -1):
+        tree = create_forest_decision_tree(dataset, num_attributes_hyperparameter, max_depth)
     
-        predictions = np.zeros((validation_set.shape[0],), dtype=np.object_)
-        for index in range(validation_set.shape[0]): #Going through every value we want to predict
-            predictions[index] = ch.predict_value(tree, validation_set[index])
+        predictions = np.zeros((testing_set.shape[0],), dtype=np.object_)
+        for index in range(testing_set.shape[0]): #Going through every value we want to predict
+            #print(index)
+            #print(testing_set[index])
+            predictions[index] = ch.predict_value(tree, testing_set[index])
         
         prediction_list.append(predictions)
         
     predictions = np.column_stack(tuple(prediction_list)) # now each column contains a different model's prediction for a row
-    modes, _ = mode(predictions, axis=1)
-    acc_results = accuracy(true_labels, np.squeeze(modes))
-    print("YOYOYOYOY HERE IS THE ACCURACY OF THE FOREST:", acc_results)
+    rf_predictions, _ = mode(predictions, axis=1)
+    return rf_predictions
+    

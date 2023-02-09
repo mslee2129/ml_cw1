@@ -65,10 +65,16 @@ if __name__ == "__main__":
     # ch.graph_compare_full_noisy(x_full, y_full, classes_full, x_noisy, y_noisy)
     
     x,y,c  = ch.read_dataset("./data/train_full.txt")
-    data = ch.concat_data_helper(x,y)   
-    x_validation, y_validation, c_validation  = ch.read_dataset("./data/validation.txt")
+    data = ch.concat_data_helper(x,y)
+    x_test, y_test, class_test  = ch.read_dataset("./data/test.txt")
+    #x_validation, y_validation, c_validation  = ch.read_dataset("./data/validation.txt")
+    #for n_att in range(2,11):
+        # def random_forest (dataset, max_depth, true_labels, validation_set, num_attributes_hyperparameter, num_trees_hyperparameter):
+    # num_attributes_hyperparameter = 5
+    # num_trees_hyperparameter = 71
+    rf_predictions= random_forest(data, x_test, 5, 71)
+    print(rf_predictions)
 
-    random_forest(data, 100, 15, y_validation, x_validation )
 
     # print("---- Welcome to Wonderland ----")
     # print("---- Loading training dataset ----")
