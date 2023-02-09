@@ -1,9 +1,10 @@
+import numpy as np
 
 ######################################
-# Read and examine
+# Read dataset
 ######################################
 
-def read_dataset(filepath):
+def load_dataset(filepath):
     """ Read in the dataset from the specified filepath
 
     Args:

@@ -5,33 +5,32 @@
 ##############################################################################
 
 import numpy as np
-
 # import classification as cl # ADDED BY US
 import classification_helpers as ch
-from classification import DecisionTreeClassifier # COMMENTED BY US
 from improvement import train_and_predict
 from evalutation_functions import print_all_evaluation_metrics
 from evalutation_functions import accuracy
 from pruning import prune
 from random_forest import random_forest
+from load_dataset import load_dataset
 
 if __name__ == "__main__":
 
     # ############# QUESTION 1 #######################
     # Reading and examining the datasets
-    #(x, y, classes) = ch.read_dataset("data/tot.txt")
+    #(x, y, classes) = load_dataset("data/tot.txt")
     #ch.examine_dataset(x,y,classes, "simple1")
 
-    #(x, y, classes) = ch.read_dataset("data/train_sub.txt")
+    #(x, y, classes) = load_dataset("data/train_sub.txt")
     # ch.examine_dataset(x,y,classes, "train_sub")
 
-    #(x, y, classes) = ch.read_dataset("data/train_noisy.txt")
+    #(x, y, classes) = load_dataset("data/train_noisy.txt")
     #ch.examine_dataset(x,y,classes, "train_noisy")
 
     # Q1.3
-    # (x_noisy, y_noisy, classes_noisy) = ch.read_dataset("data/train_noisy.txt")
+    # (x_noisy, y_noisy, classes_noisy) = load_dataset("data/train_noisy.txt")
     # noisy_data = ch.concat_data_helper(x_noisy, y_noisy)
-    # (x, y, classes) = ch.read_dataset("data/train_full.txt")
+    # (x, y, classes) = load_dataset("data/train_full.txt")
     # clean_data = ch.concat_data_helper(x,y)
     # ch.noisy_data_comparison(clean_data, noisy_data)
 
@@ -39,24 +38,24 @@ if __name__ == "__main__":
     ############### QUESTION 2 ###############
 
     # load the test set
-    # (x_test, y_test, classes_test) = ch.read_dataset("data/test.txt")
+    # (x_test, y_test, classes_test) = load_dataset("data/test.txt")
 
     # print("\nTraining model on train_full")
     # full_classifier = DecisionTreeClassifier()
-    # (x_full, y_full, classes_full) = ch.read_dataset("data/train_full.txt")
+    # (x_full, y_full, classes_full) = load_dataset("data/train_full.txt")
     # full_classifier.fit(x_full, y_full)
     # full_predictions = full_classifier.predict(x_test)
     # # print_all_evaluation_metrics(y_test, full_predictions)
     # print("\nTraining model on train_noisy")
     # noisy_classifier = DecisionTreeClassifier()
-    # (x_noisy, y_noisy, classes_noisy) = ch.read_dataset("data/train_noisy.txt")
+    # (x_noisy, y_noisy, classes_noisy) = load_dataset("data/train_noisy.txt")
     # noisy_classifier.fit(x_noisy, y_noisy)
     # noisy_predictions = noisy_classifier.predict(x_test)
     # print_all_evaluation_metrics(y_test, noisy_predictions)
 
     # print("\nTraining model on train_sub")
     # sub_classifier = DecisionTreeClassifier()
-    # (x_sub, y_sub, classes_sub) = ch.read_dataset("data/train_sub.txt")
+    # (x_sub, y_sub, classes_sub) = load_dataset("data/train_sub.txt")
     # sub_classifier.fit(x_sub, y_sub)
     # sub_predictions = sub_classifier.predict(x_test)
     # print_all_evaluation_metrics(y_test, sub_predictions)
@@ -64,10 +63,10 @@ if __name__ == "__main__":
 
     # ch.graph_compare_full_noisy(x_full, y_full, classes_full, x_noisy, y_noisy)
     
-    x,y,c  = ch.read_dataset("./data/train_full.txt")
+    x,y,c  = load_dataset("./data/train_full.txt")
     data = ch.concat_data_helper(x,y)
-    x_test, y_test, class_test  = ch.read_dataset("./data/test.txt")
-    #x_validation, y_validation, c_validation  = ch.read_dataset("./data/validation.txt")
+    x_test, y_test, class_test  = load_dataset("./data/test.txt")
+    #x_validation, y_validation, c_validation  = load_dataset("./data/validation.txt")
     #for n_att in range(2,11):
         # def random_forest (dataset, max_depth, true_labels, validation_set, num_attributes_hyperparameter, num_trees_hyperparameter):
     # num_attributes_hyperparameter = 5
@@ -78,14 +77,14 @@ if __name__ == "__main__":
 
     # print("---- Welcome to Wonderland ----")
     # print("---- Loading training dataset ----")
-    # x,y,c  = ch.read_dataset("./data/train_full.txt")
+    # x,y,c  = load_dataset("./data/train_full.txt")
     # data = ch.concat_data_helper(x,y)   
     
     # print("---- Loading validation dataset ----")
-    # x_validation, y_validation, c_validation  = ch.read_dataset("./data/validation.txt")
+    # x_validation, y_validation, c_validation  = load_dataset("./data/validation.txt")
     
     # print("---- Loading testing dataset ----")
-    # x_test, y_test, class_test  = ch.read_dataset("./data/test.txt")
+    # x_test, y_test, class_test  = load_dataset("./data/test.txt")
     
     # print("---- Launching train and predict ----")
     # predicitions = train_and_predict(x,y,x_test, x_validation, y_validation)
@@ -93,7 +92,7 @@ if __name__ == "__main__":
     # print_all_evaluation_metrics(y_test, predicitions)
     """"
     print("---- Loading dataset ----")
-    x,y,c  = ch.read_dataset("./data/train_full.txt")
+    x,y,c  = load_dataset("./data/train_full.txt")
     print_all_evaluation_metrics(y_test, predictions)
     #tree = ch.create_decision_tree(data)
     #tree.recursive_print()

@@ -8,13 +8,7 @@
 ##############################################################################
 
 import numpy as np
-from numpy.random import default_rng
 import classification_helpers as ch
-
-#############################################################################
-# Decision Tree
-##############################################################################
-
 
 class DecisionTreeClassifier(object):
     """ Basic decision tree classifier
@@ -32,7 +26,6 @@ class DecisionTreeClassifier(object):
         self.is_trained = False
         self.decision_tree = None
     
-
     def fit(self, x, y):
         """ Constructs a decision tree classifier from data
         
@@ -50,7 +43,8 @@ class DecisionTreeClassifier(object):
         
         #######################################################################
         #                 ** TASK 2.1: COMPLETE THIS METHOD **
-        #######################################################################    
+        #######################################################################   
+
         int_labels = ch.get_int_labels(y)
         data = ch.concat_data_helper(x,int_labels)
 
@@ -58,7 +52,6 @@ class DecisionTreeClassifier(object):
         
         # set a flag so that we know that the classifier has been trained
         self.is_trained = True
-        #(self.decision_tree).recursive_print()
         
     
     def predict(self, x):
@@ -87,10 +80,10 @@ class DecisionTreeClassifier(object):
         #######################################################################
         #                 ** TASK 2.2: COMPLETE THIS METHOD **
         #######################################################################
+
         #x.shape[0] returns the number of rows
         for index in range(x.shape[0]): #Going through every value we want to predict
             predictions[index] = ch.predict_value(self.decision_tree, x[index])
         
-        # remember to change this if you rename the variable
         return predictions
         

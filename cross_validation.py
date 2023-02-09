@@ -4,6 +4,7 @@ from classification import DecisionTreeClassifier
 from evalutation_functions import accuracy, print_all_evaluation_metrics
 from numpy.random import default_rng
 from scipy.stats import mode
+from load_dataset import load_dataset
 
 def k_fold_split(n_splits, n_instances, random_generator=default_rng()):
     """ Split n_instances into n mutually exclusive splits at random.
@@ -60,7 +61,7 @@ def train_test_k_fold(n_folds, n_instances, random_generator=default_rng()):
 
 # Q3.2 Implementation of 10-fold Cross validation
 
-(x, y, classes) = ch.read_dataset("data/train_full.txt")
+(x, y, classes) = load_dataset("data/train_full.txt")
 n_folds = 10
 accuracies = np.zeros((n_folds, ))
 decision_trees = []
@@ -86,7 +87,7 @@ print(accuracies.std())
 
 
 # Q3.3 Implementation
-(x_test, y_test, classes_test) = ch.read_dataset("data/test.txt")
+(x_test, y_test, classes_test) = load_dataset("data/test.txt")
 
 prediction_list = []
 # add predictions of each tree to list
