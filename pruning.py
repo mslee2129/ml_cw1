@@ -42,18 +42,23 @@ def prune(root_node, accuracy, true_labels, validation_set, node=None):
                 
     # If both children of the Node are labels:
     if(not isinstance(node.children[0], Node) and not isinstance(node.children[1], Node)):
-        repartition_left = create_label_distribution_table(node.label_distribution_left)
-        repartition_right = create_label_distribution_table(node.label_distribution_right)
+     
+        repartition_left = node.label_distribution_left
+        repartition_right = node.label_distribution_right
         
+        #print("LEFT:",repartition_left)
+        #print("RIGHT:",repartition_right)
         # now we need to join repartition_left and repartition_right
         label_repartition_full = []
         for sublist in repartition_left:
-            label_repartition_full.append([sublist[0], sublist[1]])
+            label_repartition_full.append(sublist)
 
             for right_sublist in repartition_right:
                 if right_sublist[0] == sublist[0]: #if we're not comparing the two same labels
                     label_repartition_full[-1][1] += right_sublist[1] #adding to full the value of the right subset
 
+        #print(label_repartition_full)
+        #print (find_predominant_label(label_repartition_full))
         return find_predominant_label(label_repartition_full)
         #return (find_predominant_label(label_repartition_full), -1)
 

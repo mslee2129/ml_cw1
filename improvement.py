@@ -117,7 +117,7 @@ def train_and_predict(x_train, y_train, x_test, x_val, y_val):
     # for index in range(x_test.shape[0]): #Going through every value we want to predict
     #     test_predictions[index] = ch.predict_value(decision_tree, x_test[index])
     
-    #return test_predictions
+    # return test_predictions
 
     #######################################################################
     #                            PRUNING
