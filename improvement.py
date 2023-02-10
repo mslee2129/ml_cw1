@@ -7,13 +7,13 @@
 #             You are free to add any other methods as needed. 
 ##############################################################################
 
-# import numpy as np
+import numpy as np
 import classification_helpers as ch
+from random_forest import random_forest
+from evalutation_functions import accuracy
 # from classification import DecisionTreeClassifier
 # from evalutation_functions import print_all_evaluation_metrics
-# from evalutation_functions import accuracy
 # from pruning import prune
-from random_forest import random_forest
 
 
 def train_and_predict(x_train, y_train, x_test, x_val, y_val):
@@ -59,30 +59,15 @@ def train_and_predict(x_train, y_train, x_test, x_val, y_val):
     data = ch.concat_data_helper(x_train, y_train_int_labels)
 
     #######################################################################
-    #                RANDOM FOREST
+    #                RANDOM FOREST -- BEST PERFORMING OPTION
     ####################################################################### 
+    num_attributes_col = np.shape(x_test)[1]-1
+    num_attributes_per_split = int (np.floor(np.sqrt(num_attributes_col)))
+    
+    if(num_attributes_per_split == 1 ):
+        num_attributes_per_split = 2
 
-    return random_forest(data, x_test, 5, 71)
-
-    # acc_results = accuracy(true_labels, np.squeeze(modes))
-    # print("params:", )
-    # print("num_tree:",  num_trees_hyperparameter)
-    # print("num_att:",  num_attributes_hyperparameter)
-    # print("YOYOYOYOY HERE IS THE ACCURACY OF THE FOREST:", acc_results)
-    # return acc_results
-
-
-
-
-
-
-
-
-
-
-
-
-
+    return random_forest(data, x_test, num_attributes_per_split, 71)
 
     #######################################################################
     #                FINDING BEST DEPTH FOR THE TREE
@@ -135,14 +120,6 @@ def train_and_predict(x_train, y_train, x_test, x_val, y_val):
     # max_accuracy = accuracy(y_val, predictions)
     # print("PREDICTIONS ON VALIDATION")
     # print_all_evaluation_metrics(y_val, predictions)
-    
-    # #  PREDICTING TEST VALUES
-    # print("PREDICTING TEST VALUES -- DEPTH TREE")
-    # test_predictions = np.zeros((x_test.shape[0],), dtype=np.object_)    
-    # for index in range(x_test.shape[0]): #Going through every value we want to predict
-    #     test_predictions[index] = ch.predict_value(decision_tree, x_test[index])
-    
-    # return test_predictions
 
     #######################################################################
     #                            PRUNING
@@ -159,13 +136,21 @@ def train_and_predict(x_train, y_train, x_test, x_val, y_val):
     # print_all_evaluation_metrics(y_val,pruned_predictions)
 
 
+    #######################################################################
+    #             RANDOM FOREST -- HYPERPARAMETER TUNING
+    ####################################################################### 
 
-    # #  PREDICTING TEST VALUES
-    # print("PREDICTING TEST VALUES")
-    # test_predictions = np.zeros((x_test.shape[0],), dtype=np.object_)    
-    # for index in range(x_test.shape[0]): #Going through every value we want to predict
-    #     test_predictions[index] = ch.predict_value(pruned_tree, x_test[index])
-    
-    # return test_predictions
+    # for num_tree in range(5, 80, 5):
+    #     rf_predictions = random_forest(data, x_val, 4, num_tree)
+    #     print("Num tree: ", num_tree)
+    #     print(accuracy(y_val, rf_predictions))
 
+    # for num_tree in range(70, 75):
+    #     rf_predictions = random_forest(data, x_val, 4, num_tree)
+    #     print("Num tree: ", num_tree)
+    #     print(accuracy(y_val, rf_predictions))
 
+    # for num_att in range(2, 10):
+    #     rf_predictions = random_forest(data, x_val, num_att, 71)
+    #     print("Num tree: ", num_tree)
+    #     print(accuracy(y_val, rf_predictions))

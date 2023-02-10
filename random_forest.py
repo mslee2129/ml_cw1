@@ -1,7 +1,7 @@
 import numpy as np
 from scipy.stats import mode
 from create_forest_decision_tree import create_forest_decision_tree
-from classification_helpers import predict_value
+from classification_helpers import predict_value, Node
 
 
 def random_forest (dataset, testing_set, num_attributes_hyperparameter, num_trees_hyperparameter, max_depth = 10000):
@@ -26,15 +26,23 @@ def random_forest (dataset, testing_set, num_attributes_hyperparameter, num_tree
         # def create_forest_decision_tree(dataset, num_attributes_hyperparameter ,max_depth = 10000, depth = -1):
         tree = create_forest_decision_tree(dataset, num_attributes_hyperparameter, max_depth)
     
+        
+
         predictions = np.zeros((testing_set.shape[0],), dtype=np.object_)
         for index in range(testing_set.shape[0]): #Going through every value we want to predict
-            #print(index)
-            #print(testing_set[index])
+            #For very small datasets, it is possible that the tree will make a 
+            # prediction from root node, in which case the tree always predicts
+            # a certain label
+            if not isinstance(tree, Node): 
+                predictions[index] = tree
+                continue
+
             predictions[index] = predict_value(tree, testing_set[index])
         
         prediction_list.append(predictions)
         
-    predictions = np.column_stack(tuple(prediction_list)) # now each column contains a different model's prediction for a row
+    # now each column contains a different model's prediction for a row
+    predictions = np.column_stack(tuple(prediction_list)) 
     rf_predictions, _ = mode(predictions, axis=1)
     return np.squeeze(rf_predictions)
     

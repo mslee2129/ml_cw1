@@ -1,3 +1,6 @@
+import matplotlib as plt
+import numpy as np
+
 def examine_dataset (x ,y, classes, dataset_name = ""):
     print("############", dataset_name, "############")
 
@@ -14,9 +17,9 @@ def examine_dataset (x ,y, classes, dataset_name = ""):
     print("Maximum of x :", x.max(axis=0))
     print("Mean of x :", x.mean(axis=0), "\n")
 
-    print("Minimum of y:", y.min(axis=0)) ## THIS IS NOT GIVING US WHAT WE NEED
-    print("Maximum of y:", y.max(axis=0)) ## THIS IS NOT GIVING US WHAT WE NEED
-    print("Mean of y :", y.mean(axis=0), "\n") ## THIS IS NOT GIVING US WHAT WE NEED
+    print("Minimum of y:", y.min(axis=0)) 
+    print("Maximum of y:", y.max(axis=0)) 
+    print("Mean of y :", y.mean(axis=0), "\n") 
 
     """ ------------  Number of instances  ---------------- """
     # Finding the number of instances of each class

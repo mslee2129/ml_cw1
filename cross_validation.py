@@ -1,7 +1,6 @@
-import classification_helpers as ch
 import numpy as np
 from classification import DecisionTreeClassifier
-from evalutation_functions import accuracy, print_all_evaluation_metrics
+from evalutation_functions import accuracy
 from numpy.random import default_rng
 from scipy.stats import mode
 from load_dataset import load_dataset

@@ -2,7 +2,7 @@ import numpy as np
 from math import log2
 
 ######################################
-# Helpers for recursion
+# HELPER FOR DATA
 ######################################
 
 def get_int_labels(str_labels): #Takes in string labels and returns an array with the int equivalents
@@ -18,8 +18,13 @@ def concat_data_helper(data, labels):
     return data_concat
 
 
+#####################################################
+# HOW TO MAKE SPLITTING DECISIONS - HELPER FUNCTIONS
+#####################################################
+
 def suggest_split_points(attribute_index, data):
-    assert attribute_index >= 0 and attribute_index < (len(data[0])-1), "Out of bounds: checking to split point at invalid attribute"
+    assert attribute_index >= 0 and attribute_index < (len(data[0])-1), \
+         "Out of bounds: checking to split point at invalid attribute"
 
     # Sorting the data based on the attribute
     data_sorted = data[data[:,attribute_index].argsort()]
@@ -29,23 +34,20 @@ def suggest_split_points(attribute_index, data):
     for row in range(1, len(data_sorted[:,attribute_index])): 
         
         # True [if the labels are different, or] if the attribute value are different
-        # if data_sorted[row, -1] != data_sorted[row-1, -1] or data_sorted[row, attribute_index] != data_sorted[row-1, attribute_index]:  
         if data_sorted[row, attribute_index] != data_sorted[row-1, attribute_index]:  
-        # if data_sorted[row, -1] != data_sorted[row-1, -1]:
             #finding the value (avg of the two) at which to do the split
-            candidate = (data_sorted[row, attribute_index] + data_sorted[row - 1, attribute_index]) / 2 
+            candidate = (data_sorted[row, attribute_index] + \
+                 data_sorted[row - 1, attribute_index]) / 2 
             
             #If suggestions is empty OR if the previous entry is not the same value, then append it
             if len(suggestions) == 0 or suggestions[-1] != candidate: 
                 suggestions.append(candidate)
     
-    #print("Suggestions for attribute %a:" % attribute_index, suggestions)
     return suggestions
 
-
-
 def find_optimal_node(data):
-    # optimal_node = (attribute_index, split value, label_distribution_left, label_distribution_right)
+    # optimal_node = (attribute_index, split value, 
+    #                   label_distribution_left, label_distribution_right)
     optimal_node = (0, 0, [], []) 
     max_information_gain = -1 
 
@@ -54,7 +56,8 @@ def find_optimal_node(data):
 
         # loop through suggested split points
         for split_point in suggest_split_points(i, data): 
-            information_gain, label_distribution_left, label_distribution_right = find_information_gain(data, split_point, i)
+            information_gain, label_distribution_left, label_distribution_right \
+                = find_information_gain(data, split_point, i)
             
             #if it is the new max, update optimal_nove and the max value
             if information_gain > max_information_gain: 
@@ -63,11 +66,10 @@ def find_optimal_node(data):
 
     return optimal_node
 
-
-
 def find_entropy(class_labels):
     # a list the size of the number of different class instances
-    no_of_class_instances = [0] * len(np.unique(class_labels))  # used to count occurences of each class
+    # used to count occurences of each class
+    no_of_class_instances = [0] * len(np.unique(class_labels)) 
     class_instance = list(set(class_labels)) #lists the value of the class instances
 
     for i in range (len(class_labels)):
@@ -81,15 +83,13 @@ def find_entropy(class_labels):
     return entropy
 
 
-def find_information_gain(dataset, split_value, attribute_index): # attribute-values = x; labels = y
+def find_information_gain(dataset, split_value, attribute_index):
 
     labels = dataset[:, -1] # Here we are only selecting the labels column (last one)
   
     entropy_pre_split = find_entropy(labels)
     
-    
-    split_info = (attribute_index,split_value) # POTENTIALLY remove split_info towards THE END
-    children_datasets = make_split(dataset, split_info)
+    children_datasets = make_split(dataset, attribute_index, split_value)
 
     labels_left = children_datasets[0][:,-1] # keeping only the labels column of the left dataset
     labels_right = children_datasets[1][:,-1] # keeping only the labels column of the right dataset
@@ -109,7 +109,19 @@ def find_information_gain(dataset, split_value, attribute_index): # attribute-va
     return (information_gain, label_distribution_left, label_distribution_right)
 
 
+######################################
+# SPLIT
+######################################
 
+def make_split(dataset, attribute_index, split_value):
+    data_left = dataset[dataset[:,attribute_index] < split_value]
+    data_right = dataset[dataset[:,attribute_index] >= split_value]
+
+    return [data_left, data_right]
+
+######################################
+# LABEL DISTRIBUTION HELPER FUNCTIONS
+######################################
 def create_label_distribution_table(label_array):
     label_distribution = []
     for label in label_array:
@@ -127,17 +139,20 @@ def create_label_distribution_table(label_array):
     
     return label_distribution
 
+def find_predominant_label(list_of_lists):
+    # loop through label_distribution_full to find the maximum value, and it's associated label
+        max_value = -1
+        max_label = -1
+        for sublist in list_of_lists:
+            if(sublist[1] > max_value):
+                max_value = sublist[1]
+                max_label = sublist[0]
 
+        return max_label
 
-def make_split(dataset, split_info):
-
-    attribute_index, split_value = split_info
-    data_left = dataset[dataset[:,attribute_index] < split_value]
-    data_right = dataset[dataset[:,attribute_index] >= split_value]
-    return [data_left, data_right]
 
 ######################################
-# RECURSION
+# NODE CLASS
 ######################################
 
 class Node:
@@ -164,53 +179,35 @@ class Node:
                 self.children[i].recursive_print()
             else:
                 print("Children: %i has label" % (i), self.children[i])
-     
 
-def find_predominant_label(list_of_lists):
-    # loop through label_distribution_full to find the maximum value, and it's associated label
-        max_value = -1
-        max_label = -1
-        for sublist in list_of_lists:
-            if(sublist[1] > max_value):
-                max_value = sublist[1]
-                max_label = sublist[0]
-
-        return max_label
+######################################
+# RECURSION
+######################################
 
 def create_decision_tree(dataset, max_depth = 10000, depth = -1):
     # Update depth; root depth is 0
     depth += 1
     
     labels = dataset[:,- 1] #labels column is the last one
-
-    if depth == max_depth:
-        #print("EXCEEDED MAX DEPTH")
-        distribution = create_label_distribution_table(labels)
-        return find_predominant_label(distribution)
     
-    # if only one type of label left or they all have the same attributes
-    if len(np.unique(labels)) == 1 or len(np.unique(labels)) == 0 or len(np.unique((dataset[:,:-1]), axis=0)) == 1: 
+    # if only one type of label left or they all have the same attributes , or max_depth
+    if len(np.unique(labels)) == 1 or len(np.unique(labels)) == 0 or \
+        len(np.unique((dataset[:,:-1]), axis=0)) == 1 or depth == max_depth:
         distribution = create_label_distribution_table(labels)
         return find_predominant_label(distribution)
 
     optimal_node = find_optimal_node(dataset) 
-    
     node = Node(optimal_node) # creating a new node
 
     #unpacking because make_split only needs the first three elements
-    attribute_index, split_value, label_distribution_left, label_distribution_right = optimal_node
+    attribute_index, split_value, unused1, unused2 = optimal_node
+    children_datasets = make_split(dataset, attribute_index, split_value)
 
-    children_datasets = make_split(dataset, (attribute_index, split_value))
-    # print('\nWe are splitting dataset: ', dataset)
-    # print('\n into: ')
-    # print(children_datasets[0])
-    # if children_datasets[0].shape[0] == 0:
-    #     print("They are equal !!")
-    # print('and \n')
-    # print(children_datasets[1])
+    # If one of the children datasets is empty, we are returning the predominant label
     if children_datasets[0].shape[0] == 0 or children_datasets[1].shape[0] == 0:
         distribution = create_label_distribution_table(labels)
         return find_predominant_label(distribution)
+
     for i in range(len(children_datasets)): # 0 or 1
         child_node = create_decision_tree(children_datasets[i], max_depth, depth)
   

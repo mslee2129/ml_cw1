@@ -15,7 +15,6 @@ def prune(root_node, accuracy, true_labels, validation_set, node=None):
         if(isinstance(node.children[child_index], Node)): # If children is a Node
             
             prune_return_value, maybe_accuracy = prune(root_node, accuracy, true_labels, validation_set, node.children[child_index] ) # Recursive call
-            #prune_return_value = prune(root_node, accuracy, true_labels, validation_set, node.children[child_index] ) # Recursive call
             
             if(not isinstance(prune_return_value, Node)): # If the recursion call returned a label (and not a Node)
                 
@@ -48,12 +47,10 @@ def prune(root_node, accuracy, true_labels, validation_set, node=None):
                     label_repartition_full[-1][1] += right_sublist[1] #adding to full the value of the right subset
 
         
-        #return find_predominant_label(label_repartition_full)
         return (find_predominant_label(label_repartition_full), -1)
 
     # Return if you don't have two labels
     return (root_node, accuracy) # returns itself
-    #return root_node # returns itself
 
 
 def calculate_accuracy(root_node, validation_set, true_labels):

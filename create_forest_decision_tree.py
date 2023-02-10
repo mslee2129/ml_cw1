@@ -2,19 +2,14 @@ import numpy as np
 from classification_helpers import Node, find_predominant_label, create_label_distribution_table, find_optimal_node, make_split
 
 
-def create_forest_decision_tree(dataset, num_attributes_hyperparameter ,max_depth = 10000, depth = -1):
+def create_forest_decision_tree(dataset, num_attributes_hyperparameter, max_depth = 10000, depth = -1):
     # Update depth; root depth is 0
     depth += 1
     
     labels = dataset[:,- 1] #labels column is the last one
-
-    if depth == max_depth:
-        #print("EXCEEDED MAX DEPTH")
-        distribution = create_label_distribution_table(labels)
-        return find_predominant_label(distribution)
     
-    # if only one type of label left or they all have the same attributes
-    if len(np.unique(labels)) == 1 or len(np.unique(labels)) == 0 or len(np.unique((dataset[:,:-1]), axis=0)) == 1: 
+    # if only one type of label left or they all have the same attributes, or max_depth
+    if len(np.unique(labels)) == 1 or len(np.unique(labels)) == 0 or len(np.unique((dataset[:,:-1]), axis=0)) == 1 or depth == max_depth: 
         distribution = create_label_distribution_table(labels)
         return find_predominant_label(distribution)
 
@@ -31,18 +26,19 @@ def create_forest_decision_tree(dataset, num_attributes_hyperparameter ,max_dept
     optimal_node = find_optimal_node(subset)
     # ensure optimal split point and attribute is extracted from function
     optimal_node = (selected_attributes[optimal_node[0]],) + optimal_node[1:]
-
     
     node = Node(optimal_node) # creating a new node
 
     #unpacking because make_split only needs the first three elements
-    attribute_index, split_value, label_distribution_left, label_distribution_right = optimal_node
+    attribute_index, split_value, unused_1, unused_2 = optimal_node
 
-    children_datasets = make_split(dataset, (attribute_index, split_value))
+    children_datasets = make_split(dataset, attribute_index, split_value)
 
+    # If one of the children datasets is empty, we are returning the predominant label
     if children_datasets[0].shape[0] == 0 or children_datasets[1].shape[0] == 0:
         distribution = create_label_distribution_table(labels)
         return find_predominant_label(distribution)
+
     for i in range(len(children_datasets)): # 0 or 1
         child_node = create_forest_decision_tree(children_datasets[i], num_attributes_hyperparameter, max_depth, depth)
   
